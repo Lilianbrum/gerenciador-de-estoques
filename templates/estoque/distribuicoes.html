@@ -1,0 +1,193 @@
+{% extends "estoque/base.html" %}
+
+{% block title %}Distribuições{% endblock %}
+
+{% block topbar_title %}Distribuições{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+
+<div>
+    <h1>Distribuições</h1>
+    <p>Consulte os produtos distribuídos para cada destino.</p>
+</div>
+
+
+</div>
+
+<div class="panel">
+
+
+<div class="panel-header">
+
+    <div>
+        <h2>Produtos distribuídos</h2>
+        <p>
+            Consulte produto, quantidade, destino, usuário e data da distribuição.
+        </p>
+    </div>
+
+</div>
+
+
+<form method="get" class="search-box">
+
+    <input
+        type="text"
+        name="q"
+        value="{{ termo }}"
+        placeholder="Pesquisar produto, destino ou observação..."
+    >
+
+    <button
+        type="submit"
+        class="btn"
+    >
+        Pesquisar
+    </button>
+
+    {% if termo %}
+
+        <a
+            href="{% url 'distribuicoes' %}"
+            class="btn"
+        >
+            Limpar
+        </a>
+
+    {% endif %}
+
+</form>
+
+
+{% if distribuicoes %}
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Data</th>
+
+                    <th>Produto</th>
+
+                    <th>Quantidade</th>
+
+                    <th>Destino</th>
+
+                    <th>Usuário</th>
+
+                    <th>Observação</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for movimentacao in distribuicoes %}
+
+                    <tr>
+
+                        <td>
+                            {{ movimentacao.criado_em|date:"d/m/Y H:i" }}
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+                                {{ movimentacao.produto.nome }}
+                            </strong>
+
+                            {% if movimentacao.produto.codigo %}
+
+                                <br>
+
+                                <small>
+                                    Código: {{ movimentacao.produto.codigo }}
+                                </small>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+                                {{ movimentacao.quantidade }}
+                            </strong>
+
+                            {{ movimentacao.produto.unidade }}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if movimentacao.destino %}
+
+                                {{ movimentacao.destino.nome }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+                            {{ movimentacao.usuario.username }}
+                        </td>
+
+
+                        <td>
+                            {{ movimentacao.observacao|default:"-" }}
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+{% else %}
+
+    <div class="empty-state">
+
+        {% if termo %}
+
+            <p>
+                Nenhuma distribuição encontrada para
+                "{{ termo }}".
+            </p>
+
+        {% else %}
+
+            <p>
+                Nenhuma distribuição registrada.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+{% endif %}
+
+
+</div>
+
+{% endblock %}

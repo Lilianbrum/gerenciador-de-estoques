@@ -1,0 +1,263 @@
+{% extends "estoque/base.html" %}
+
+{% block title %}
+Histórico de Movimentações
+{% endblock %}
+
+{% block topbar_title %}
+Histórico de Movimentações
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Histórico de Movimentações</h1>
+        <p>
+            Consulte todas as entradas, saídas e ajustes realizados no estoque.
+        </p>
+    </div>
+
+
+<div>
+    <a href="{% url 'entrada_estoque' %}" class="btn btn-primary">
+        + Entrada
+    </a>
+
+    <a href="{% url 'saida_estoque' %}" class="btn">
+        − Saída / Distribuição
+    </a>
+</div>
+
+
+</div>
+
+<div class="panel">
+
+
+<div class="panel-header">
+    <div>
+        <h2>Filtros</h2>
+        <p>Pesquise por produto, código, destino, usuário ou observação.</p>
+    </div>
+</div>
+
+<form method="get">
+
+    <div class="search-box">
+
+        <input
+            type="text"
+            name="q"
+            value="{{ termo }}"
+            placeholder="Pesquisar movimentação..."
+        >
+
+        <select name="tipo">
+
+            <option value="">
+                Todos os tipos
+            </option>
+
+            <option
+                value="E"
+                {% if tipo == "E" %}selected{% endif %}
+            >
+                Entradas
+            </option>
+
+            <option
+                value="S"
+                {% if tipo == "S" %}selected{% endif %}
+            >
+                Saídas
+            </option>
+
+            <option
+                value="A"
+                {% if tipo == "A" %}selected{% endif %}
+            >
+                Ajustes
+            </option>
+
+        </select>
+
+        <button type="submit" class="btn btn-primary">
+            Filtrar
+        </button>
+
+        <a href="{% url 'historico_movimentacoes' %}" class="btn">
+            Limpar
+        </a>
+
+    </div>
+
+</form>
+
+
+</div>
+
+<div class="panel">
+
+
+<div class="panel-header">
+
+    <div>
+        <h2>Movimentações</h2>
+
+        <p>
+            {{ movimentacoes|length }}
+            registro{{ movimentacoes|length|pluralize }}
+            encontrado{{ movimentacoes|length|pluralize }}.
+        </p>
+    </div>
+
+</div>
+
+
+{% if movimentacoes %}
+
+<div style="overflow-x: auto;">
+
+    <table>
+
+        <thead>
+
+            <tr>
+                <th>Data</th>
+                <th>Produto</th>
+                <th>Código</th>
+                <th>Tipo</th>
+                <th>Quantidade</th>
+                <th>Destino</th>
+                <th>Usuário</th>
+                <th>Observação</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for movimentacao in movimentacoes %}
+
+            <tr>
+
+                <td>
+                    {{ movimentacao.criado_em|date:"d/m/Y H:i" }}
+                </td>
+
+                <td>
+                    <strong>
+                        {{ movimentacao.produto.nome }}
+                    </strong>
+                </td>
+
+                <td>
+                    {% if movimentacao.produto.codigo %}
+                        {{ movimentacao.produto.codigo }}
+                    {% else %}
+                        —
+                    {% endif %}
+                </td>
+
+                <td>
+
+                    {% if movimentacao.tipo == "E" %}
+
+                        <span class="badge badge-success">
+                            Entrada
+                        </span>
+
+                    {% elif movimentacao.tipo == "S" %}
+
+                        <span class="badge badge-danger">
+                            Saída
+                        </span>
+
+                    {% else %}
+
+                        <span class="badge badge-warning">
+                            Ajuste
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if movimentacao.tipo == "E" %}
+
+                        <strong>
+                            +{{ movimentacao.quantidade }}
+                        </strong>
+
+                    {% elif movimentacao.tipo == "S" %}
+
+                        <strong>
+                            -{{ movimentacao.quantidade }}
+                        </strong>
+
+                    {% else %}
+
+                        <strong>
+                            {{ movimentacao.quantidade }}
+                        </strong>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if movimentacao.destino %}
+                        {{ movimentacao.destino.nome }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </td>
+
+                <td>
+                    {{ movimentacao.usuario.username }}
+                </td>
+
+                <td>
+
+                    {% if movimentacao.observacao %}
+                        {{ movimentacao.observacao }}
+                    {% else %}
+                        —
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+{% else %}
+
+<div class="empty-state">
+
+    <h3>Nenhuma movimentação encontrada</h3>
+
+    <p>
+        Ainda não existem movimentações que correspondam aos filtros
+        informados.
+    </p>
+
+</div>
+
+{% endif %}
+
+
+</div>
+
+{% endblock %}

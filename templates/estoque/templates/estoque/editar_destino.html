@@ -1,0 +1,106 @@
+{% extends "estoque/base.html" %}
+
+{% block title %}Editar destino{% endblock %}
+
+{% block topbar_title %}Editar destino{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Editar destino</h1>
+        <p>Atualize as informações do destino selecionado.</p>
+    </div>
+
+
+<a href="{% url 'destinos' %}" class="btn">
+    Voltar para destinos
+</a>
+
+
+</div>
+
+<div class="panel">
+
+
+<div class="panel-header">
+    <h2>{{ destino.nome }}</h2>
+</div>
+
+<form method="post">
+
+    {% csrf_token %}
+
+    {% if form.non_field_errors %}
+        <div class="messages">
+            {% for error in form.non_field_errors %}
+                <div class="message error">
+                    {{ error }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="form-group">
+        <label for="{{ form.nome.id_for_label }}">
+            {{ form.nome.label }}
+        </label>
+
+        {{ form.nome }}
+
+        {% if form.nome.errors %}
+            <div class="field-error">
+                {{ form.nome.errors }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label for="{{ form.tipo.id_for_label }}">
+            {{ form.tipo.label }}
+        </label>
+
+        {{ form.tipo }}
+
+        {% if form.tipo.errors %}
+            <div class="field-error">
+                {{ form.tipo.errors }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group">
+        <label for="{{ form.descricao.id_for_label }}">
+            {{ form.descricao.label }}
+        </label>
+
+        {{ form.descricao }}
+
+        {% if form.descricao.errors %}
+            <div class="field-error">
+                {{ form.descricao.errors }}
+            </div>
+        {% endif %}
+    </div>
+
+    <div class="form-group checkbox-group">
+        <label>
+            {{ form.ativo }}
+            {{ form.ativo.label }}
+        </label>
+    </div>
+
+    <button type="submit" class="btn btn-primary">
+        Salvar alterações
+    </button>
+
+    <a href="{% url 'destinos' %}" class="btn">
+        Cancelar
+    </a>
+
+</form>
+
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,191 @@
+{% extends "estoque/base.html" %}
+
+{% block title %}Categorias{% endblock %}
+
+{% block topbar_title %}
+Categorias
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+
+<div>
+    <h1>Categorias</h1>
+
+    <p>
+        Organize os produtos por categorias.
+    </p>
+</div>
+
+<div>
+    <a href="{% url 'novo_produto' %}" class="btn btn-primary">
+        + Novo produto
+    </a>
+</div>
+
+
+</div>
+
+<div class="content-grid">
+
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>Nova categoria</h2>
+
+            <p>
+                Cadastre uma categoria para organizar seus produtos.
+            </p>
+        </div>
+
+    </div>
+
+
+    <form method="post">
+
+        {% csrf_token %}
+
+
+        {% if form.non_field_errors %}
+
+            <div class="message message-error">
+                {{ form.non_field_errors }}
+            </div>
+
+        {% endif %}
+
+
+        <div class="form-group">
+
+            <label for="{{ form.nome.id_for_label }}">
+                Nome da categoria
+            </label>
+
+            {{ form.nome }}
+
+            {% if form.nome.errors %}
+                <div class="field-error">
+                    {{ form.nome.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.descricao.id_for_label }}">
+                Descrição
+            </label>
+
+            {{ form.descricao }}
+
+            {% if form.descricao.errors %}
+                <div class="field-error">
+                    {{ form.descricao.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Cadastrar categoria
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>Categorias cadastradas</h2>
+
+            <p>
+                Categorias disponíveis para os produtos.
+            </p>
+        </div>
+
+    </div>
+
+
+    {% if categorias %}
+
+        <div class="category-list">
+
+            {% for categoria in categorias %}
+
+                <div class="category-item">
+
+                    <div class="category-info">
+
+                        <strong>
+                            {{ categoria.nome }}
+                        </strong>
+
+                        {% if categoria.descricao %}
+
+                            <span>
+                                {{ categoria.descricao }}
+                            </span>
+
+                        {% endif %}
+
+                    </div>
+
+
+                    <div class="category-count">
+
+                        <strong>
+                            {{ categoria.produtos.count }}
+                        </strong>
+
+                        <span>
+                            produto{{ categoria.produtos.count|pluralize }}
+                        </span>
+
+                    </div>
+
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>Nenhuma categoria cadastrada</h3>
+
+            <p>
+                Cadastre a primeira categoria usando o formulário
+                ao lado.
+            </p>
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+</div>
+
+{% endblock %}

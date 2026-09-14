@@ -1,0 +1,322 @@
+﻿{% extends "estoque/base.html" %}
+
+{% block title %}Novo produto{% endblock %}
+
+{% block topbar_title %}
+Novo produto
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+
+<div>
+    <h1>Novo produto</h1>
+
+    <p>
+        Cadastre a ficha de um novo produto no sistema.
+    </p>
+</div>
+
+<div>
+    <a href="{% url 'produtos' %}" class="btn">
+        Voltar para produtos
+    </a>
+</div>
+
+
+</div>
+
+<div class="panel">
+
+
+<div class="panel-header">
+
+    <div>
+        <h2>Dados do produto</h2>
+
+        <p>
+            Preencha as informações disponíveis sobre o produto.
+        </p>
+    </div>
+
+</div>
+
+
+<form method="post">
+
+    {% csrf_token %}
+
+
+    {% if form.non_field_errors %}
+
+        <div class="message message-error">
+            {{ form.non_field_errors }}
+        </div>
+
+    {% endif %}
+
+
+    <div class="form-grid">
+
+
+        <div class="form-group">
+
+            <label for="{{ form.nome.id_for_label }}">
+                Nome do produto
+            </label>
+
+            {{ form.nome }}
+
+            {% if form.nome.errors %}
+                <div class="field-error">
+                    {{ form.nome.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.codigo.id_for_label }}">
+                Código
+            </label>
+
+            {{ form.codigo }}
+
+            {% if form.codigo.errors %}
+                <div class="field-error">
+                    {{ form.codigo.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.tipo_produto.id_for_label }}">
+                Tipo do produto
+            </label>
+
+            {{ form.tipo_produto }}
+
+            {% if form.tipo_produto.errors %}
+                <div class="field-error">
+                    {{ form.tipo_produto.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.categoria.id_for_label }}">
+                Categoria
+            </label>
+
+            {{ form.categoria }}
+
+            {% if form.categoria.errors %}
+                <div class="field-error">
+                    {{ form.categoria.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.condicao.id_for_label }}">
+                Condição
+            </label>
+
+            {{ form.condicao }}
+
+            {% if form.condicao.errors %}
+                <div class="field-error">
+                    {{ form.condicao.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.documento_origem.id_for_label }}">
+                Documento de origem
+            </label>
+
+            {{ form.documento_origem }}
+
+            {% if form.documento_origem.errors %}
+                <div class="field-error">
+                    {{ form.documento_origem.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.unidade.id_for_label }}">
+                Unidade
+            </label>
+
+            {{ form.unidade }}
+
+            {% if form.unidade.errors %}
+                <div class="field-error">
+                    {{ form.unidade.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.estoque_minimo.id_for_label }}">
+                Estoque mínimo
+            </label>
+
+            {{ form.estoque_minimo }}
+
+            {% if form.estoque_minimo.errors %}
+                <div class="field-error">
+                    {{ form.estoque_minimo.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="{{ form.descricao.id_for_label }}">
+            Descrição / Observações
+        </label>
+
+        {{ form.descricao }}
+
+        {% if form.descricao.errors %}
+            <div class="field-error">
+                {{ form.descricao.errors }}
+            </div>
+        {% endif %}
+
+    </div>
+
+
+    <div class="form-group checkbox-group">
+
+        <label for="{{ form.ativo.id_for_label }}">
+
+            {{ form.ativo }}
+
+            Produto ativo
+
+        </label>
+
+        {% if form.ativo.errors %}
+            <div class="field-error">
+                {{ form.ativo.errors }}
+            </div>
+        {% endif %}
+
+    </div>
+
+
+    <div class="form-actions">
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Cadastrar produto
+        </button>
+
+        <a
+            href="{% url 'produtos' %}"
+            class="btn"
+        >
+            Cancelar
+        </a>
+
+    </div>
+
+</form>
+
+
+</div>
+
+<div class="panel">
+
+
+<div class="panel-header">
+
+    <div>
+        <h2>Informações adicionais</h2>
+
+        <p>
+            Use a descrição para características específicas
+            que variam de acordo com o tipo de produto.
+        </p>
+
+    </div>
+
+</div>
+
+
+<div class="info-grid">
+
+    <div class="info-item">
+
+        <strong>Eletrônicos</strong>
+
+        <span>
+            RAM, armazenamento em GB, IMEI, marca, modelo,
+            origem e outras características.
+        </span>
+
+    </div>
+
+
+    <div class="info-item">
+
+        <strong>Veículos</strong>
+
+        <span>
+            Marca, modelo, ano, placa, características
+            e demais informações disponíveis.
+        </span>
+
+    </div>
+
+
+    <div class="info-item">
+
+        <strong>Outros produtos</strong>
+
+        <span>
+            Registre na descrição as características
+            relevantes para aquele item.
+        </span>
+
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

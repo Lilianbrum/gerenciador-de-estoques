@@ -1,0 +1,396 @@
+{% extends "estoque/base.html" %}
+
+{% block title %}Distribuições{% endblock %}
+
+{% block topbar_title %}Distribuições{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+```
+<div>
+    <h1>Distribuições</h1>
+
+    <p>
+        Consulte os produtos distribuídos para cada destino.
+    </p>
+</div>
+```
+
+</div>
+
+<!-- RESUMO -->
+
+<div class="cards">
+
+```
+<div class="card">
+
+    <div class="card-title">
+        Distribuições
+    </div>
+
+    <div class="card-value">
+        {{ total_distribuicoes }}
+    </div>
+
+    <div class="card-description">
+        Registros encontrados
+    </div>
+
+</div>
+
+
+<div class="card">
+
+    <div class="card-title">
+        Itens distribuídos
+    </div>
+
+    <div class="card-value">
+        {{ quantidade_total_distribuida }}
+    </div>
+
+    <div class="card-description">
+        Quantidade total
+    </div>
+
+</div>
+```
+
+</div>
+
+<!-- FILTROS -->
+
+<div class="panel">
+
+```
+<div class="panel-header">
+
+    <div>
+
+        <h2>Filtros</h2>
+
+        <p>
+            Use os filtros para localizar distribuições específicas.
+        </p>
+
+    </div>
+
+</div>
+
+
+<form method="get">
+
+    <div class="content-grid">
+
+
+        <!-- PESQUISA -->
+
+        <div class="form-group">
+
+            <label for="id_q">
+                Pesquisa
+            </label>
+
+            <input
+                type="text"
+                id="id_q"
+                name="q"
+                value="{{ termo }}"
+                placeholder="Produto, código, destino ou observação..."
+            >
+
+        </div>
+
+
+        <!-- DESTINO -->
+
+        <div class="form-group">
+
+            <label for="id_destino">
+                Destino
+            </label>
+
+            <select
+                id="id_destino"
+                name="destino"
+            >
+
+                <option value="">
+                    Todos os destinos
+                </option>
+
+                {% for destino in destinos_disponiveis %}
+
+                    <option
+                        value="{{ destino.id }}"
+                        {% if destino_id == destino.id|stringformat:"s" %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ destino.nome }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- PRODUTO -->
+
+        <div class="form-group">
+
+            <label for="id_produto">
+                Produto
+            </label>
+
+            <select
+                id="id_produto"
+                name="produto"
+            >
+
+                <option value="">
+                    Todos os produtos
+                </option>
+
+                {% for produto in produtos_disponiveis %}
+
+                    <option
+                        value="{{ produto.id }}"
+                        {% if produto_id == produto.id|stringformat:"s" %}
+                            selected
+                        {% endif %}
+                    >
+                        {{ produto.nome }}
+                    </option>
+
+                {% endfor %}
+
+            </select>
+
+        </div>
+
+
+        <!-- DATA INICIAL -->
+
+        <div class="form-group">
+
+            <label for="id_data_inicio">
+                Data inicial
+            </label>
+
+            <input
+                type="date"
+                id="id_data_inicio"
+                name="data_inicio"
+                value="{{ data_inicio }}"
+            >
+
+        </div>
+
+
+        <!-- DATA FINAL -->
+
+        <div class="form-group">
+
+            <label for="id_data_fim">
+                Data final
+            </label>
+
+            <input
+                type="date"
+                id="id_data_fim"
+                name="data_fim"
+                value="{{ data_fim }}"
+            >
+
+        </div>
+
+
+    </div>
+
+
+    <div class="action-buttons">
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Aplicar filtros
+        </button>
+
+
+        <a
+            href="{% url 'distribuicoes' %}"
+            class="btn"
+        >
+            Limpar filtros
+        </a>
+
+    </div>
+
+</form>
+```
+
+</div>
+
+<!-- RESULTADOS -->
+
+<div class="panel">
+
+```
+<div class="panel-header">
+
+    <div>
+
+        <h2>Produtos distribuídos</h2>
+
+        <p>
+            Consulte produto, quantidade, destino, usuário e data.
+        </p>
+
+    </div>
+
+</div>
+
+
+{% if distribuicoes %}
+
+    <div class="table-container">
+
+        <table>
+
+            <thead>
+
+                <tr>
+
+                    <th>Data</th>
+
+                    <th>Produto</th>
+
+                    <th>Quantidade</th>
+
+                    <th>Destino</th>
+
+                    <th>Usuário</th>
+
+                    <th>Observação</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for movimentacao in distribuicoes %}
+
+                    <tr>
+
+                        <td>
+
+                            {{ movimentacao.criado_em|date:"d/m/Y H:i" }}
+
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+                                {{ movimentacao.produto.nome }}
+                            </strong>
+
+                            {% if movimentacao.produto.codigo %}
+
+                                <br>
+
+                                <small>
+                                    Código:
+                                    {{ movimentacao.produto.codigo }}
+                                </small>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            <strong>
+                                {{ movimentacao.quantidade }}
+                            </strong>
+
+                            {{ movimentacao.produto.unidade }}
+
+                        </td>
+
+
+                        <td>
+
+                            {% if movimentacao.destino %}
+
+                                {{ movimentacao.destino.nome }}
+
+                            {% else %}
+
+                                -
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ movimentacao.usuario.username }}
+
+                        </td>
+
+
+                        <td>
+
+                            {{ movimentacao.observacao|default:"-" }}
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+{% else %}
+
+    <div class="empty-state">
+
+        {% if termo or destino_id or produto_id or data_inicio or data_fim %}
+
+            <p>
+                Nenhuma distribuição encontrada com os filtros selecionados.
+            </p>
+
+        {% else %}
+
+            <p>
+                Nenhuma distribuição registrada.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+{% endif %}
+```
+
+</div>
+
+{% endblock %}

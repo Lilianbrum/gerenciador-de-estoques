@@ -1,0 +1,238 @@
+{% extends "estoque/base.html" %}
+
+{% block title %}Destinos{% endblock %}
+
+{% block topbar_title %}Destinos{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+    <div>
+        <h1>Destinos</h1>
+        <p>Cadastre e gerencie os locais, órgãos, setores ou clientes que recebem produtos.</p>
+    </div>
+</div>
+
+<div class="content-grid">
+
+
+<div class="panel">
+
+    <div class="panel-header">
+        <h2>Novo destino</h2>
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+
+        {% if form.non_field_errors %}
+            <div class="messages">
+                {% for error in form.non_field_errors %}
+                    <div class="message error">
+                        {{ error }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <div class="form-group">
+            <label for="{{ form.nome.id_for_label }}">
+                {{ form.nome.label }}
+            </label>
+
+            {{ form.nome }}
+
+            {% if form.nome.errors %}
+                <div class="field-error">
+                    {{ form.nome.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.tipo.id_for_label }}">
+                {{ form.tipo.label }}
+            </label>
+
+            {{ form.tipo }}
+
+            {% if form.tipo.errors %}
+                <div class="field-error">
+                    {{ form.tipo.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group">
+            <label for="{{ form.descricao.id_for_label }}">
+                {{ form.descricao.label }}
+            </label>
+
+            {{ form.descricao }}
+
+            {% if form.descricao.errors %}
+                <div class="field-error">
+                    {{ form.descricao.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <div class="form-group checkbox-group">
+            <label>
+                {{ form.ativo }}
+                {{ form.ativo.label }}
+            </label>
+
+            {% if form.ativo.errors %}
+                <div class="field-error">
+                    {{ form.ativo.errors }}
+                </div>
+            {% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary">
+            Cadastrar destino
+        </button>
+
+    </form>
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-header">
+        <div>
+            <h2>Destinos cadastrados</h2>
+            <p>Consulte, edite ou ative/desative os destinos.</p>
+        </div>
+    </div>
+
+    <form method="get" class="search-box">
+
+        <input
+            type="text"
+            name="q"
+            value="{{ termo }}"
+            placeholder="Pesquisar destino..."
+        >
+
+        <button type="submit" class="btn">
+            Pesquisar
+        </button>
+
+        {% if termo %}
+            <a href="{% url 'destinos' %}" class="btn">
+                Limpar
+            </a>
+        {% endif %}
+
+    </form>
+
+
+    {% if destinos %}
+
+        <div class="table-container">
+
+            <table>
+
+                <thead>
+                    <tr>
+                        <th>Destino</th>
+                        <th>Tipo</th>
+                        <th>Descrição</th>
+                        <th>Status</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for destino in destinos %}
+
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    {{ destino.nome }}
+                                </strong>
+                            </td>
+
+                            <td>
+                                {{ destino.tipo|default:"-" }}
+                            </td>
+
+                            <td>
+                                {{ destino.descricao|default:"-" }}
+                            </td>
+
+                            <td>
+
+                                {% if destino.ativo %}
+                                    <span class="badge badge-success">
+                                        Ativo
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-danger">
+                                        Inativo
+                                    </span>
+                                {% endif %}
+
+                            </td>
+
+                            <td>
+
+                                <div class="action-buttons">
+
+                                    <a
+                                        href="{% url 'editar_destino' destino.id %}"
+                                        class="btn btn-small"
+                                    >
+                                        Editar
+                                    </a>
+
+                                    <a
+                                        href="{% url 'alternar_destino' destino.id %}"
+                                        class="btn btn-small"
+                                    >
+                                        {% if destino.ativo %}
+                                            Desativar
+                                        {% else %}
+                                            Ativar
+                                        {% endif %}
+                                    </a>
+
+                                </div>
+
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            {% if termo %}
+                <p>Nenhum destino encontrado para "{{ termo }}".</p>
+            {% else %}
+                <p>Nenhum destino cadastrado.</p>
+            {% endif %}
+
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+</div>
+
+{% endblock %}

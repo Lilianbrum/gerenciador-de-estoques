@@ -1,0 +1,220 @@
+{% extends "estoque/base.html" %}
+
+{% block title %}Saída / Distribuição{% endblock %}
+
+{% block topbar_title %}
+Saída / Distribuição
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+
+<div>
+    <h1>Saída / Distribuição</h1>
+
+    <p>
+        Registre a saída de produtos e informe o destino.
+    </p>
+</div>
+
+<div>
+    <a href="{% url 'produtos' %}" class="btn">
+        Consultar produtos
+    </a>
+</div>
+
+
+</div>
+
+<div class="panel">
+
+
+<div class="panel-header">
+
+    <div>
+        <h2>Registrar saída</h2>
+
+        <p>
+            Informe o produto, a quantidade e para onde
+            os itens serão destinados.
+        </p>
+    </div>
+
+</div>
+
+
+<form method="post">
+
+    {% csrf_token %}
+
+
+    {% if form.non_field_errors %}
+
+        <div class="message message-error">
+            {{ form.non_field_errors }}
+        </div>
+
+    {% endif %}
+
+
+    <div class="form-grid">
+
+
+        <div class="form-group">
+
+            <label for="{{ form.produto.id_for_label }}">
+                Produto
+            </label>
+
+            {{ form.produto }}
+
+            {% if form.produto.errors %}
+                <div class="field-error">
+                    {{ form.produto.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <div class="form-group">
+
+            <label for="{{ form.quantidade.id_for_label }}">
+                Quantidade
+            </label>
+
+            {{ form.quantidade }}
+
+            {% if form.quantidade.errors %}
+                <div class="field-error">
+                    {{ form.quantidade.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="{{ form.destino.id_for_label }}">
+            Destino
+        </label>
+
+        {{ form.destino }}
+
+        {% if form.destino.errors %}
+            <div class="field-error">
+                {{ form.destino.errors }}
+            </div>
+        {% endif %}
+
+    </div>
+
+
+    <div class="form-group">
+
+        <label for="{{ form.observacao.id_for_label }}">
+            Observação
+        </label>
+
+        {{ form.observacao }}
+
+        {% if form.observacao.errors %}
+            <div class="field-error">
+                {{ form.observacao.errors }}
+            </div>
+        {% endif %}
+
+    </div>
+
+
+    <div class="form-actions">
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Registrar saída
+        </button>
+
+        <a
+            href="{% url 'dashboard' %}"
+            class="btn"
+        >
+            Cancelar
+        </a>
+
+    </div>
+
+</form>
+
+
+</div>
+
+<div class="panel">
+
+
+<div class="panel-header">
+
+    <div>
+        <h2>Distribuição</h2>
+
+        <p>
+            Cada saída fica registrada no histórico do estoque.
+        </p>
+    </div>
+
+</div>
+
+
+<div class="info-grid">
+
+    <div class="info-item">
+        <strong>Produto</strong>
+
+        <span>
+            Selecione o item que será distribuído.
+        </span>
+    </div>
+
+
+    <div class="info-item">
+        <strong>Quantidade</strong>
+
+        <span>
+            Informe o número de unidades que sairão
+            do estoque.
+        </span>
+    </div>
+
+
+    <div class="info-item">
+        <strong>Destino</strong>
+
+        <span>
+            Identifique para onde os produtos estão sendo
+            enviados.
+        </span>
+    </div>
+
+
+    <div class="info-item">
+        <strong>Observação</strong>
+
+        <span>
+            Utilize este campo para informações adicionais
+            sobre a distribuição.
+        </span>
+    </div>
+
+</div>
+
+
+</div>
+
+{% endblock %}

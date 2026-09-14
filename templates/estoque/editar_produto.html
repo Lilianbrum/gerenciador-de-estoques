@@ -1,0 +1,105 @@
+{% extends "estoque/base.html" %}
+
+{% block title %}Editar produto{% endblock %}
+
+{% block topbar_title %}Editar produto{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+        <h1>Editar produto</h1>
+        <p>Atualize as informações do produto selecionado.</p>
+    </div>
+
+    <a href="{% url 'produtos' %}" class="btn">
+        Voltar para produtos
+    </a>
+
+</div>
+
+
+<div class="panel">
+
+    <div class="panel-header">
+
+        <div>
+            <h2>{{ produto.nome }}</h2>
+            <p>Altere somente as informações necessárias.</p>
+        </div>
+
+    </div>
+
+
+    <form method="post">
+
+        {% csrf_token %}
+
+
+        {% if form.non_field_errors %}
+
+            <div class="messages">
+
+                {% for error in form.non_field_errors %}
+
+                    <div class="message error">
+                        {{ error }}
+                    </div>
+
+                {% endfor %}
+
+            </div>
+
+        {% endif %}
+
+
+        {% for field in form %}
+
+            <div class="form-group">
+
+                <label for="{{ field.id_for_label }}">
+                    {{ field.label }}
+                </label>
+
+                {{ field }}
+
+                {% if field.help_text %}
+                    <small>
+                        {{ field.help_text }}
+                    </small>
+                {% endif %}
+
+                {% if field.errors %}
+
+                    <div class="field-error">
+                        {{ field.errors }}
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+        {% endfor %}
+
+
+        <button
+            type="submit"
+            class="btn btn-primary"
+        >
+            Salvar alterações
+        </button>
+
+
+        <a
+            href="{% url 'produtos' %}"
+            class="btn"
+        >
+            Cancelar
+        </a>
+
+    </form>
+
+</div>
+
+{% endblock %}
