@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="pt-br">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -82,6 +83,33 @@
 
         .menu a.active {
             background: #2563eb;
+            color: white;
+        }
+
+        /* BOTÃO SAIR */
+
+        .logout-form {
+            margin: 0;
+        }
+
+        .logout-button {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin: 4px 0;
+            border: none;
+            border-radius: 8px;
+            background: transparent;
+            color: #dbe2ee;
+            font-family: inherit;
+            font-size: 14px;
+            text-align: left;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+
+        .logout-button:hover {
+            background: #26334d;
             color: white;
         }
 
@@ -430,9 +458,12 @@
                 Sistema
             </div>
 
-            <a href="{% url 'logout' %}">
-                Sair
-            </a>
+            <form method="post" action="{% url 'logout' %}" class="logout-form">
+                {% csrf_token %}
+                <button type="submit" class="logout-button">
+                    Sair
+                </button>
+            </form>
 
         </div>
 
