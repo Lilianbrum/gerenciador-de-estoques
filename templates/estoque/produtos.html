@@ -112,7 +112,7 @@ Produtos
 
     .summary {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 15px;
         margin-bottom: 20px;
     }
@@ -236,18 +236,7 @@ Produtos
     .stock {
         font-weight: bold;
         font-size: 16px;
-    }
-
-    .stock-low {
-        color: #dc2626;
-    }
-
-    .stock-ok {
-        color: #15803d;
-    }
-
-    .stock-zero {
-        color: #991b1b;
+        color: #111827;
     }
 
     .status-active {
@@ -608,19 +597,6 @@ Produtos
     <div class="summary-card">
 
         <div class="summary-label">
-            Estoque baixo
-        </div>
-
-        <div class="summary-value">
-            {{ produtos_estoque_baixo|default:0 }}
-        </div>
-
-    </div>
-
-
-    <div class="summary-card">
-
-        <div class="summary-label">
             Produtos ativos
         </div>
 
@@ -753,25 +729,9 @@ Produtos
 
                     <td>
 
-                        {% if produto.estoque_atual == 0 %}
-
-                            <span class="stock stock-zero">
-                                {{ produto.estoque_atual }}
-                            </span>
-
-                        {% elif produto.estoque_atual <= produto.estoque_minimo %}
-
-                            <span class="stock stock-low">
-                                {{ produto.estoque_atual }} ⚠️
-                            </span>
-
-                        {% else %}
-
-                            <span class="stock stock-ok">
-                                {{ produto.estoque_atual }}
-                            </span>
-
-                        {% endif %}
+                        <span class="stock">
+                            {{ produto.estoque_atual }}
+                        </span>
 
                         {{ produto.unidade }}
 
@@ -973,25 +933,9 @@ Produtos
 
                         <div class="mobile-info-value">
 
-                            {% if produto.estoque_atual == 0 %}
-
-                                <span class="stock stock-zero">
-                                    {{ produto.estoque_atual }}
-                                </span>
-
-                            {% elif produto.estoque_atual <= produto.estoque_minimo %}
-
-                                <span class="stock stock-low">
-                                    {{ produto.estoque_atual }} ⚠️
-                                </span>
-
-                            {% else %}
-
-                                <span class="stock stock-ok">
-                                    {{ produto.estoque_atual }}
-                                </span>
-
-                            {% endif %}
+                            <span class="stock">
+                                {{ produto.estoque_atual }}
+                            </span>
 
                             {{ produto.unidade }}
 
