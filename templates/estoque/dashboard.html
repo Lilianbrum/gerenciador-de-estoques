@@ -26,7 +26,7 @@
 
     .cards {
         display: grid;
-        grid-template-columns: repeat(4, 1fr);
+        grid-template-columns: repeat(3, 1fr);
         gap: 18px;
         margin-bottom: 25px;
     }
@@ -292,23 +292,6 @@ Dashboard
         <div class="card">
 
             <div class="card-title">
-                Estoque baixo
-            </div>
-
-            <div class="card-value">
-                {{ produtos_estoque_baixo }}
-            </div>
-
-            <div class="card-description">
-                Produtos no limite ou abaixo do mínimo
-            </div>
-
-        </div>
-
-
-        <div class="card">
-
-            <div class="card-title">
                 Itens distribuídos
             </div>
 
@@ -487,93 +470,6 @@ Dashboard
             {% endif %}
 
         </div>
-
-    </div>
-
-
-    <!-- ALERTAS DE ESTOQUE -->
-
-    <div class="table-card" style="margin-bottom: 25px;">
-
-        <div class="section-title">
-            ⚠️ Alertas de estoque
-        </div>
-
-
-        {% if produtos_baixo_estoque %}
-
-            <table>
-
-                <thead>
-
-                    <tr>
-                        <th>Produto</th>
-                        <th>Categoria</th>
-                        <th>Estoque atual</th>
-                        <th>Estoque mínimo</th>
-                        <th>Status</th>
-                    </tr>
-
-                </thead>
-
-
-                <tbody>
-
-                    {% for produto in produtos_baixo_estoque %}
-
-                        <tr>
-
-                            <td>
-                                <strong>
-                                    {{ produto.nome }}
-                                </strong>
-                            </td>
-
-                            <td>
-                                {{ produto.categoria.nome }}
-                            </td>
-
-                            <td>
-                                {{ produto.estoque_atual }}
-                            </td>
-
-                            <td>
-                                {{ produto.estoque_minimo }}
-                            </td>
-
-                            <td>
-
-                                {% if produto.estoque_atual == 0 %}
-
-                                    <span class="badge badge-danger">
-                                        Sem estoque
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="badge badge-warning">
-                                        Estoque baixo
-                                    </span>
-
-                                {% endif %}
-
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        {% else %}
-
-            <div class="empty">
-                ✓ Nenhum produto está abaixo do estoque mínimo.
-            </div>
-
-        {% endif %}
 
     </div>
 

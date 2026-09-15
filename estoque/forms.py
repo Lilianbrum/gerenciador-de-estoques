@@ -146,6 +146,27 @@ class ProdutoForm(forms.ModelForm):
             ),
         }
 
+    def clean_codigo(self):
+        codigo = self.cleaned_data.get("codigo", "").strip()
+
+        if not codigo:
+            return ""
+
+        consulta = Produto.objects.filter(codigo__iexact=codigo)
+
+        # Ao editar, não considerar o próprio produto como duplicado.
+        if self.instance and self.instance.pk:
+            consulta = consulta.exclude(pk=self.instance.pk)
+
+        if consulta.exists():
+            raise forms.ValidationError(
+                "Já existe um produto cadastrado com este código. "
+                "Se for o mesmo produto, utilize a Entrada de Estoque "
+                "para adicionar a quantidade."
+            )
+
+        return codigo
+
 
 class CategoriaForm(forms.ModelForm):
 
