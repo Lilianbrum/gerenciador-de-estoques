@@ -370,6 +370,7 @@ Dashboard
                         <tr>
                             <th>Produto</th>
                             <th>Categoria</th>
+                            <th>Condição</th>
                             <th>Quantidade</th>
                         </tr>
 
@@ -387,6 +388,14 @@ Dashboard
 
                                 <td>
                                     {{ produto.categoria.nome }}
+                                </td>
+
+                                <td>
+                                    {% if produto.condicao %}
+                                        {{ produto.condicao }}
+                                    {% else %}
+                                        —
+                                    {% endif %}
                                 </td>
 
                                 <td>
