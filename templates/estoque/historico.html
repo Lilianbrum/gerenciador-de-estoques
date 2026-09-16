@@ -11,252 +11,389 @@ Histórico de Movimentações
 {% block content %}
 
 <div class="page-header">
+
     <div>
+
         <h1>Histórico de Movimentações</h1>
+
         <p>
             Consulte todas as entradas, saídas e ajustes realizados no estoque.
         </p>
+
     </div>
 
-
-<div>
-    <a href="{% url 'entrada_estoque' %}" class="btn btn-primary">
-        + Entrada
-    </a>
-
-    <a href="{% url 'saida_estoque' %}" class="btn">
-        − Saída / Distribuição
-    </a>
-</div>
-
-
-</div>
-
-<div class="panel">
-
-
-<div class="panel-header">
     <div>
-        <h2>Filtros</h2>
-        <p>Pesquise por produto, código, destino, usuário ou observação.</p>
-    </div>
-</div>
 
-<form method="get">
-
-    <div class="search-box">
-
-        <input
-            type="text"
-            name="q"
-            value="{{ termo }}"
-            placeholder="Pesquisar movimentação..."
+        <a
+            href="{% url 'entrada_estoque' %}"
+            class="btn btn-primary"
         >
+            + Entrada
+        </a>
 
-        <select name="tipo">
-
-            <option value="">
-                Todos os tipos
-            </option>
-
-            <option
-                value="E"
-                {% if tipo == "E" %}selected{% endif %}
-            >
-                Entradas
-            </option>
-
-            <option
-                value="S"
-                {% if tipo == "S" %}selected{% endif %}
-            >
-                Saídas
-            </option>
-
-            <option
-                value="A"
-                {% if tipo == "A" %}selected{% endif %}
-            >
-                Ajustes
-            </option>
-
-        </select>
-
-        <button type="submit" class="btn btn-primary">
-            Filtrar
-        </button>
-
-        <a href="{% url 'historico_movimentacoes' %}" class="btn">
-            Limpar
+        <a
+            href="{% url 'saida_estoque' %}"
+            class="btn"
+        >
+            − Saída / Distribuição
         </a>
 
     </div>
 
-</form>
-
-
 </div>
+
 
 <div class="panel">
 
+    <div class="panel-header">
 
-<div class="panel-header">
+        <div>
 
-    <div>
-        <h2>Movimentações</h2>
+            <h2>Filtros</h2>
 
-        <p>
-            {{ movimentacoes|length }}
-            registro{{ movimentacoes|length|pluralize }}
-            encontrado{{ movimentacoes|length|pluralize }}.
-        </p>
+            <p>
+                Pesquise por produto, código, destino,
+                usuário, configuração ou observação.
+            </p>
+
+        </div>
+
     </div>
 
-</div>
+
+    <form method="get">
+
+        <div class="search-box">
+
+            <input
+                type="text"
+                name="q"
+                value="{{ termo }}"
+                placeholder="Pesquisar movimentação..."
+            >
 
 
-{% if movimentacoes %}
+            <select name="tipo">
 
-<div style="overflow-x: auto;">
+                <option value="">
+                    Todos os tipos
+                </option>
 
-    <table>
+                <option
+                    value="E"
+                    {% if tipo == "E" %}selected{% endif %}
+                >
+                    Entradas
+                </option>
 
-        <thead>
+                <option
+                    value="S"
+                    {% if tipo == "S" %}selected{% endif %}
+                >
+                    Saídas
+                </option>
 
-            <tr>
-                <th>Data</th>
-                <th>Produto</th>
-                <th>Código</th>
-                <th>Tipo</th>
-                <th>Quantidade</th>
-                <th>Destino</th>
-                <th>Usuário</th>
-                <th>Observação</th>
-            </tr>
+                <option
+                    value="A"
+                    {% if tipo == "A" %}selected{% endif %}
+                >
+                    Ajustes
+                </option>
 
-        </thead>
+            </select>
 
-        <tbody>
 
-            {% for movimentacao in movimentacoes %}
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Filtrar
+            </button>
 
-            <tr>
 
-                <td>
-                    {{ movimentacao.criado_em|date:"d/m/Y H:i" }}
-                </td>
+            <a
+                href="{% url 'historico_movimentacoes' %}"
+                class="btn"
+            >
+                Limpar
+            </a>
 
-                <td>
-                    <strong>
-                        {{ movimentacao.produto.nome }}
-                    </strong>
-                </td>
+        </div>
 
-                <td>
-                    {% if movimentacao.produto.codigo %}
-                        {{ movimentacao.produto.codigo }}
-                    {% else %}
-                        —
-                    {% endif %}
-                </td>
-
-                <td>
-
-                    {% if movimentacao.tipo == "E" %}
-
-                        <span class="badge badge-success">
-                            Entrada
-                        </span>
-
-                    {% elif movimentacao.tipo == "S" %}
-
-                        <span class="badge badge-danger">
-                            Saída
-                        </span>
-
-                    {% else %}
-
-                        <span class="badge badge-warning">
-                            Ajuste
-                        </span>
-
-                    {% endif %}
-
-                </td>
-
-                <td>
-
-                    {% if movimentacao.tipo == "E" %}
-
-                        <strong>
-                            +{{ movimentacao.quantidade }}
-                        </strong>
-
-                    {% elif movimentacao.tipo == "S" %}
-
-                        <strong>
-                            -{{ movimentacao.quantidade }}
-                        </strong>
-
-                    {% else %}
-
-                        <strong>
-                            {{ movimentacao.quantidade }}
-                        </strong>
-
-                    {% endif %}
-
-                </td>
-
-                <td>
-
-                    {% if movimentacao.destino %}
-                        {{ movimentacao.destino.nome }}
-                    {% else %}
-                        —
-                    {% endif %}
-
-                </td>
-
-                <td>
-                    {{ movimentacao.usuario.username }}
-                </td>
-
-                <td>
-
-                    {% if movimentacao.observacao %}
-                        {{ movimentacao.observacao }}
-                    {% else %}
-                        —
-                    {% endif %}
-
-                </td>
-
-            </tr>
-
-            {% endfor %}
-
-        </tbody>
-
-    </table>
+    </form>
 
 </div>
 
-{% else %}
 
-<div class="empty-state">
+<div class="panel">
 
-    <h3>Nenhuma movimentação encontrada</h3>
+    <div class="panel-header">
 
-    <p>
-        Ainda não existem movimentações que correspondam aos filtros
-        informados.
-    </p>
+        <div>
 
-</div>
+            <h2>Movimentações</h2>
 
-{% endif %}
+            <p>
+                {{ movimentacoes|length }}
+                registro{{ movimentacoes|length|pluralize }}
+                encontrado{{ movimentacoes|length|pluralize }}.
+            </p>
 
+        </div>
+
+    </div>
+
+
+    {% if movimentacoes %}
+
+        <div style="overflow-x: auto;">
+
+            <table>
+
+                <thead>
+
+                    <tr>
+
+                        <th>Data</th>
+
+                        <th>Produto</th>
+
+                        <th>Código</th>
+
+                        <th>Configuração</th>
+
+                        <th>Tipo</th>
+
+                        <th>Quantidade</th>
+
+                        <th>Destino</th>
+
+                        <th>Usuário</th>
+
+                        <th>Observação</th>
+
+                        {% if request.user.is_staff %}
+                            <th>Ações</th>
+                        {% endif %}
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                    {% for movimentacao in movimentacoes %}
+
+                        <tr>
+
+                            <td>
+                                {{ movimentacao.criado_em|date:"d/m/Y H:i" }}
+                            </td>
+
+
+                            <td>
+
+                                <strong>
+                                    {{ movimentacao.produto.nome }}
+                                </strong>
+
+                            </td>
+
+
+                            <td>
+
+                                {% if movimentacao.produto.codigo %}
+
+                                    {{ movimentacao.produto.codigo }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if movimentacao.configuracao %}
+
+                                    <strong>
+                                        {% if movimentacao.configuracao.capacidade %}
+                                            {{ movimentacao.configuracao.capacidade }}
+                                        {% endif %}
+
+                                        {% if movimentacao.configuracao.memoria_ram %}
+                                            / {{ movimentacao.configuracao.memoria_ram }} RAM
+                                        {% endif %}
+                                    </strong>
+
+                                    {% if movimentacao.configuracao.condicao %}
+                                        <br>
+                                        <small>
+                                            {{ movimentacao.configuracao.condicao }}
+                                        </small>
+                                    {% endif %}
+
+                                {% else %}
+
+                                    <span title="Movimentação antiga sem configuração registrada">
+                                        —
+
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if movimentacao.tipo == "E" %}
+
+                                    <span class="badge badge-success">
+                                        Entrada
+                                    </span>
+
+                                {% elif movimentacao.tipo == "S" %}
+
+                                    <span class="badge badge-danger">
+                                        Saída
+                                    </span>
+
+                                {% else %}
+
+                                    <span class="badge badge-warning">
+                                        Ajuste
+                                    </span>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if movimentacao.tipo == "E" %}
+
+                                    <strong>
+                                        +{{ movimentacao.quantidade }}
+                                    </strong>
+
+                                {% elif movimentacao.tipo == "S" %}
+
+                                    <strong>
+                                        -{{ movimentacao.quantidade }}
+                                    </strong>
+
+                                {% else %}
+
+                                    <strong>
+                                        {{ movimentacao.quantidade }}
+                                    </strong>
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+
+                                {% if movimentacao.destino %}
+
+                                    {{ movimentacao.destino.nome }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            <td>
+                                {{ movimentacao.usuario.username }}
+                            </td>
+
+
+                            <td>
+
+                                {% if movimentacao.observacao %}
+
+                                    {{ movimentacao.observacao }}
+
+                                {% else %}
+
+                                    —
+
+                                {% endif %}
+
+                            </td>
+
+
+                            {% if request.user.is_staff %}
+
+                                <td>
+
+                                    {% if movimentacao.tipo == "E" or movimentacao.tipo == "S" %}
+
+                                        <form
+                                            method="post"
+                                            action="{% url 'excluir_movimentacao' movimentacao.id %}"
+                                            style="display: inline;"
+                                            onsubmit="return confirm('ATENÇÃO: esta ação irá remover a movimentação e reverter o estoque correspondente. Deseja continuar?');"
+                                        >
+
+                                            {% csrf_token %}
+
+                                            <button
+                                                type="submit"
+                                                class="btn"
+                                            >
+                                                Excluir
+                                            </button>
+
+                                        </form>
+
+                                    {% else %}
+
+                                        —
+
+                                    {% endif %}
+
+                                </td>
+
+                            {% endif %}
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    {% else %}
+
+        <div class="empty-state">
+
+            <h3>
+                Nenhuma movimentação encontrada
+            </h3>
+
+            <p>
+                Ainda não existem movimentações que correspondam
+                aos filtros informados.
+            </p>
+
+        </div>
+
+    {% endif %}
 
 </div>
 

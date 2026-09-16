@@ -3,8 +3,13 @@ from collections import defaultdict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import models, transaction
-from django.shortcuts import redirect, render, get_object_or_404
+from django.core.exceptions import ValidationError
+from django.db import models
+from django.shortcuts import (
+    redirect,
+    render,
+    get_object_or_404,
+)
 from django.utils import timezone
 
 from .forms import (
@@ -21,6 +26,12 @@ from .models import (
     Destino,
     Movimentacao,
     ConfiguracaoEstoque,
+)
+
+from .services import (
+    registrar_entrada,
+    registrar_saida,
+    reverter_movimentacao,
 )
 
 
@@ -157,7 +168,10 @@ def dashboard(request):
         Produto.objects
         .filter(ativo=True)
         .select_related("categoria")
-        .order_by("-estoque_atual", "nome")[:10]
+        .order_by(
+            "-estoque_atual",
+            "nome"
+        )[:10]
     )
 
     distribuicoes_por_destino = defaultdict(int)
@@ -479,116 +493,74 @@ def entrada_estoque(request):
 
         if form.is_valid():
 
-            produto = form.cleaned_data[
-                "produto"
-            ]
+            try:
 
-            descricao = form.cleaned_data.get(
-                "descricao",
-                ""
-            ).strip()
-
-            capacidade = form.cleaned_data.get(
-                "capacidade",
-                ""
-            ).strip()
-
-            memoria_ram = form.cleaned_data.get(
-                "memoria_ram",
-                ""
-            ).strip()
-
-            condicao = form.cleaned_data.get(
-                "condicao",
-                ""
-            ).strip()
-
-            origem = form.cleaned_data.get(
-                "origem",
-                ""
-            ).strip()
-
-            documento_origem = form.cleaned_data.get(
-                "documento_origem",
-                ""
-            ).strip()
-
-            quantidade = form.cleaned_data[
-                "quantidade"
-            ]
-
-            observacao = form.cleaned_data[
-                "observacao"
-            ]
-
-            with transaction.atomic():
-
-                configuracao, criada = (
-                    ConfiguracaoEstoque.objects.get_or_create(
-                        produto=produto,
-                        descricao=descricao,
-                        capacidade=capacidade,
-                        memoria_ram=memoria_ram,
-                        condicao=condicao,
-                        origem=origem,
-                        documento_origem=documento_origem,
-                        defaults={
-                            "quantidade": 0,
-                            "observacao": observacao,
-                            "ativo": True,
-                        }
-                    )
-                )
-
-                configuracao.quantidade += quantidade
-
-                if observacao:
-                    configuracao.observacao = observacao
-
-                configuracao.ativo = True
-
-                configuracao.save()
-
-                produto.estoque_atual += quantidade
-
-                produto.save(
-                    update_fields=[
-                        "estoque_atual",
-                        "atualizado_em",
-                    ]
-                )
-
-                Movimentacao.objects.create(
-                    produto=produto,
-                    configuracao=configuracao,
-                    tipo="E",
-                    quantidade=quantidade,
-                    observacao=observacao,
+                movimentacao, criada = registrar_entrada(
+                    produto=form.cleaned_data["produto"],
+                    quantidade=form.cleaned_data["quantidade"],
                     usuario=request.user,
+                    descricao=form.cleaned_data.get(
+                        "descricao",
+                        ""
+                    ).strip(),
+                    capacidade=form.cleaned_data.get(
+                        "capacidade",
+                        ""
+                    ).strip(),
+                    memoria_ram=form.cleaned_data.get(
+                        "memoria_ram",
+                        ""
+                    ).strip(),
+                    condicao=form.cleaned_data.get(
+                        "condicao",
+                        ""
+                    ).strip(),
+                    origem=form.cleaned_data.get(
+                        "origem",
+                        ""
+                    ).strip(),
+                    documento_origem=form.cleaned_data.get(
+                        "documento_origem",
+                        ""
+                    ).strip(),
+                    observacao=form.cleaned_data.get(
+                        "observacao",
+                        ""
+                    ),
                 )
 
-            if criada:
+                if criada:
 
-                mensagem_configuracao = (
-                    " e uma nova configuração foi criada"
+                    mensagem = (
+                        "Entrada registrada com sucesso. "
+                        "Uma nova configuração de estoque "
+                        "foi criada."
+                    )
+
+                else:
+
+                    mensagem = (
+                        "Entrada registrada com sucesso. "
+                        "A configuração existente foi atualizada."
+                    )
+
+                messages.success(
+                    request,
+                    mensagem
                 )
 
-            else:
-
-                mensagem_configuracao = (
-                    " e a configuração existente foi atualizada"
+                return redirect(
+                    "entrada_estoque"
                 )
 
-            messages.success(
-                request,
-                f"Entrada de {quantidade} unidade(s) "
-                f"de {produto.nome} registrada com sucesso"
-                f"{mensagem_configuracao}."
-            )
+            except ValidationError as exc:
 
-            return redirect(
-                "entrada_estoque"
-            )
+                form.add_error(
+                    None,
+                    exc.message
+                    if hasattr(exc, "message")
+                    else str(exc)
+                )
 
     else:
 
@@ -618,59 +590,38 @@ def saida_estoque(request):
 
         if form.is_valid():
 
-            produto = form.cleaned_data[
-                "produto"
-            ]
+            try:
 
-            quantidade = form.cleaned_data[
-                "quantidade"
-            ]
-
-            destino = form.cleaned_data[
-                "destino"
-            ]
-
-            observacao = form.cleaned_data[
-                "observacao"
-            ]
-
-            if quantidade > produto.estoque_atual:
-
-                form.add_error(
-                    "quantidade",
-                    "A quantidade solicitada é maior "
-                    "que o estoque disponível."
-                )
-
-            else:
-
-                produto.estoque_atual -= quantidade
-
-                produto.save(
-                    update_fields=[
-                        "estoque_atual",
-                        "atualizado_em",
-                    ]
-                )
-
-                Movimentacao.objects.create(
-                    produto=produto,
-                    destino=destino,
-                    tipo="S",
-                    quantidade=quantidade,
-                    observacao=observacao,
+                registrar_saida(
+                    produto=form.cleaned_data["produto"],
+                    quantidade=form.cleaned_data["quantidade"],
                     usuario=request.user,
+                    destino=form.cleaned_data["destino"],
+                    configuracao=form.cleaned_data[
+                        "configuracao"
+                    ],
+                    observacao=form.cleaned_data.get(
+                        "observacao",
+                        ""
+                    ),
                 )
 
                 messages.success(
                     request,
-                    f"Saída de {quantidade} unidade(s) "
-                    f"de {produto.nome} registrada "
-                    f"para {destino.nome}."
+                    "Saída de estoque registrada com sucesso."
                 )
 
                 return redirect(
                     "saida_estoque"
+                )
+
+            except ValidationError as exc:
+
+                form.add_error(
+                    None,
+                    exc.message
+                    if hasattr(exc, "message")
+                    else str(exc)
                 )
 
     else:
@@ -687,7 +638,7 @@ def saida_estoque(request):
 
 
 # ============================================================
-# HISTÓRICO DE MOVIMENTAÇÕES
+# HISTÓRICO
 # ============================================================
 
 @login_required
@@ -704,10 +655,56 @@ def historico_movimentacoes(request):
         .order_by("-criado_em")
     )
 
+    termo = request.GET.get(
+        "q",
+        ""
+    ).strip()
+
     tipo = request.GET.get(
         "tipo",
         ""
     ).strip()
+
+    produto_id = request.GET.get(
+        "produto",
+        ""
+    ).strip()
+
+    data_inicio = request.GET.get(
+        "data_inicio",
+        ""
+    ).strip()
+
+    data_fim = request.GET.get(
+        "data_fim",
+        ""
+    ).strip()
+
+    if termo:
+
+        movimentacoes = movimentacoes.filter(
+            models.Q(produto__nome__icontains=termo)
+            |
+            models.Q(produto__codigo__icontains=termo)
+            |
+            models.Q(destino__nome__icontains=termo)
+            |
+            models.Q(usuario__username__icontains=termo)
+            |
+            models.Q(observacao__icontains=termo)
+            |
+            models.Q(
+                configuracao__capacidade__icontains=termo
+            )
+            |
+            models.Q(
+                configuracao__memoria_ram__icontains=termo
+            )
+            |
+            models.Q(
+                configuracao__condicao__icontains=termo
+            )
+        )
 
     if tipo:
 
@@ -715,21 +712,11 @@ def historico_movimentacoes(request):
             tipo=tipo
         )
 
-    produto_id = request.GET.get(
-        "produto",
-        ""
-    ).strip()
-
     if produto_id:
 
         movimentacoes = movimentacoes.filter(
             produto_id=produto_id
         )
-
-    data_inicio = request.GET.get(
-        "data_inicio",
-        ""
-    ).strip()
 
     if data_inicio:
 
@@ -747,11 +734,6 @@ def historico_movimentacoes(request):
         except ValueError:
 
             pass
-
-    data_fim = request.GET.get(
-        "data_fim",
-        ""
-    ).strip()
 
     if data_fim:
 
@@ -778,6 +760,9 @@ def historico_movimentacoes(request):
     context = {
         "movimentacoes": movimentacoes,
         "produtos": produtos_lista,
+        "termo": termo,
+        "q": termo,
+        "tipo": tipo,
         "tipo_selecionado": tipo,
         "produto_selecionado": produto_id,
         "data_inicio": data_inicio,
@@ -788,6 +773,78 @@ def historico_movimentacoes(request):
         request,
         "estoque/historico.html",
         context
+    )
+
+
+@login_required
+def excluir_movimentacao(
+    request,
+    movimentacao_id
+):
+
+    if request.method != "POST":
+
+        messages.error(
+            request,
+            "A exclusão de movimentações deve ser realizada "
+            "por uma solicitação POST."
+        )
+
+        return redirect(
+            "historico_movimentacoes"
+        )
+
+    if not request.user.is_staff:
+
+        messages.error(
+            request,
+            "Somente usuários autorizados podem excluir "
+            "movimentações."
+        )
+
+        return redirect(
+            "historico_movimentacoes"
+        )
+
+    movimentacao = get_object_or_404(
+        Movimentacao,
+        id=movimentacao_id
+    )
+
+    try:
+
+        descricao = (
+            f"{movimentacao.get_tipo_display() if hasattr(movimentacao, 'get_tipo_display') else movimentacao.tipo} "
+            f"de {movimentacao.quantidade} unidade(s) "
+            f"do produto {movimentacao.produto.nome}"
+        )
+
+        reverter_movimentacao(
+            movimentacao_id=movimentacao_id,
+            usuario=request.user,
+        )
+
+        messages.success(
+            request,
+            f"Movimentação removida e estoque revertido: "
+            f"{descricao}."
+        )
+
+    except ValidationError as exc:
+
+        mensagem = (
+            exc.message
+            if hasattr(exc, "message")
+            else str(exc)
+        )
+
+        messages.error(
+            request,
+            mensagem
+        )
+
+    return redirect(
+        "historico_movimentacoes"
     )
 
 

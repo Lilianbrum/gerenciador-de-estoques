@@ -25,8 +25,6 @@ class Produto(models.Model):
         max_length=200
     )
 
-    # Mantido temporariamente para preservar os dados atuais.
-    # Será reorganizado na próxima etapa.
     descricao = models.TextField(
         blank=True
     )
@@ -41,13 +39,11 @@ class Produto(models.Model):
         blank=True
     )
 
-    # Mantido temporariamente para migração dos dados existentes.
     condicao = models.CharField(
         max_length=20,
         blank=True
     )
 
-    # Mantido temporariamente para migração dos dados existentes.
     documento_origem = models.CharField(
         max_length=100,
         blank=True
@@ -64,8 +60,6 @@ class Produto(models.Model):
         default="UN"
     )
 
-    # Mantido temporariamente como estoque total do produto.
-    # Posteriormente será alimentado pelas configurações.
     estoque_atual = models.PositiveIntegerField(
         default=0
     )
@@ -97,20 +91,35 @@ class Produto(models.Model):
 
 class ConfiguracaoEstoque(models.Model):
     """
-    Representa uma configuração específica de um produto
-    dentro do estoque.
+    Características específicas de uma determinada configuração
+    de um produto.
 
-    Um mesmo produto pode possuir várias configurações.
+    Os campos são opcionais para permitir que o sistema trabalhe
+    com eletrônicos, móveis, talheres, equipamentos e outros tipos
+    de materiais.
 
-    Exemplo:
+    Exemplos:
 
-    Produto:
-        Samsung Galaxy Tab A9
+    iPad:
+        Marca: Apple
+        Modelo: A2602
+        Capacidade: 64 GB
+        RAM: 4 GB
+        Condição: Novo
 
-    Configurações:
-        64 GB / 4 GB RAM / Novo
-        128 GB / 8 GB RAM / Novo
-        128 GB / 8 GB RAM / Usado
+    Mesa:
+        Marca: -
+        Modelo: -
+        Material: Madeira
+        Cor: Marrom
+        Dimensões: 1,20 m x 0,60 m
+        Condição: Usado
+
+    Talher:
+        Material: Aço inox
+        Cor: Prata
+        Dimensões: 20 cm
+        Condição: Novo
     """
 
     produto = models.ForeignKey(
@@ -120,6 +129,31 @@ class ConfiguracaoEstoque(models.Model):
     )
 
     descricao = models.TextField(
+        blank=True
+    )
+
+    marca = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    modelo = models.CharField(
+        max_length=150,
+        blank=True
+    )
+
+    material = models.CharField(
+        max_length=150,
+        blank=True
+    )
+
+    cor = models.CharField(
+        max_length=100,
+        blank=True
+    )
+
+    dimensoes = models.CharField(
+        max_length=200,
         blank=True
     )
 
@@ -171,8 +205,11 @@ class ConfiguracaoEstoque(models.Model):
     class Meta:
         verbose_name = "Configuração de estoque"
         verbose_name_plural = "Configurações de estoque"
+
         ordering = [
             "produto__nome",
+            "marca",
+            "modelo",
             "capacidade",
             "memoria_ram",
             "condicao",
@@ -181,11 +218,26 @@ class ConfiguracaoEstoque(models.Model):
     def __str__(self):
         partes = [self.produto.nome]
 
+        if self.marca:
+            partes.append(self.marca)
+
+        if self.modelo:
+            partes.append(self.modelo)
+
         if self.capacidade:
             partes.append(self.capacidade)
 
         if self.memoria_ram:
             partes.append(self.memoria_ram)
+
+        if self.material:
+            partes.append(self.material)
+
+        if self.cor:
+            partes.append(self.cor)
+
+        if self.dimensoes:
+            partes.append(self.dimensoes)
 
         if self.condicao:
             partes.append(self.condicao)
@@ -228,9 +280,6 @@ class Movimentacao(models.Model):
         related_name="movimentacoes"
     )
 
-    # A configuração será utilizada nas novas movimentações.
-    # O campo começa opcional para permitir a migração segura
-    # das movimentações que já existem no sistema.
     configuracao = models.ForeignKey(
         ConfiguracaoEstoque,
         on_delete=models.PROTECT,

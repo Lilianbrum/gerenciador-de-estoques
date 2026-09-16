@@ -4,6 +4,7 @@ from .models import (
     Produto,
     Destino,
     Categoria,
+    ConfiguracaoEstoque,
 )
 
 
@@ -27,13 +28,73 @@ class EntradaEstoqueForm(forms.Form):
         )
     )
 
+    marca = forms.CharField(
+        label="Marca",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": (
+                    "Ex.: Apple, Samsung, Tramontina..."
+                )
+            }
+        )
+    )
+
+    modelo = forms.CharField(
+        label="Modelo",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": (
+                    "Ex.: A2602, Galaxy A15, modelo 120..."
+                )
+            }
+        )
+    )
+
+    material = forms.CharField(
+        label="Material",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": (
+                    "Ex.: aço inox, madeira, plástico..."
+                )
+            }
+        )
+    )
+
+    cor = forms.CharField(
+        label="Cor",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": (
+                    "Ex.: prata, preto, branco, marrom..."
+                )
+            }
+        )
+    )
+
+    dimensoes = forms.CharField(
+        label="Dimensões / tamanho",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": (
+                    "Ex.: 20 cm, 1,20 m x 0,60 m, tamanho M..."
+                )
+            }
+        )
+    )
+
     capacidade = forms.CharField(
         label="Capacidade",
         required=False,
         widget=forms.TextInput(
             attrs={
                 "placeholder": (
-                    "Ex.: 64 GB, 128 GB, 256 GB, 1 TB..."
+                    "Ex.: 64 GB, 128 GB, 256 GB, 1 TB, 20 L..."
                 )
             }
         )
@@ -69,7 +130,7 @@ class EntradaEstoqueForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "placeholder": (
-                    "Ex.: China, Índia, Não indicado..."
+                    "Ex.: China, Índia, Brasil, Não indicado..."
                 )
             }
         )
@@ -116,9 +177,24 @@ class SaidaEstoqueForm(forms.Form):
         label="Produto"
     )
 
+    configuracao = forms.ModelChoiceField(
+        queryset=ConfiguracaoEstoque.objects.filter(
+            ativo=True
+        ).select_related(
+            "produto"
+        ),
+        label="Configuração",
+        empty_label="Selecione a configuração"
+    )
+
     quantidade = forms.IntegerField(
         label="Quantidade",
-        min_value=1
+        min_value=1,
+        widget=forms.NumberInput(
+            attrs={
+                "min": 1
+            }
+        )
     )
 
     destino = forms.ModelChoiceField(
@@ -135,6 +211,31 @@ class SaidaEstoqueForm(forms.Form):
             }
         )
     )
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        produto = cleaned_data.get(
+            "produto"
+        )
+
+        configuracao = cleaned_data.get(
+            "configuracao"
+        )
+
+        if (
+            produto is not None
+            and configuracao is not None
+            and configuracao.produto_id != produto.id
+        ):
+            self.add_error(
+                "configuracao",
+                "A configuração selecionada não pertence "
+                "ao produto escolhido."
+            )
+
+        return cleaned_data
 
 
 class ProdutoForm(forms.ModelForm):
@@ -183,7 +284,7 @@ class ProdutoForm(forms.ModelForm):
                 attrs={
                     "placeholder": (
                         "Ex.: Smartphone, tablet, cadeira, "
-                        "balança, veículo, ferramenta..."
+                        "balança, veículo, ferramenta, talher..."
                     )
                 }
             ),
@@ -206,6 +307,7 @@ class ProdutoForm(forms.ModelForm):
         }
 
     def clean_codigo(self):
+
         codigo = self.cleaned_data.get(
             "codigo",
             ""
@@ -218,14 +320,14 @@ class ProdutoForm(forms.ModelForm):
             codigo__iexact=codigo
         )
 
-        # Ao editar, não considerar o próprio produto
-        # como duplicado.
         if self.instance and self.instance.pk:
+
             consulta = consulta.exclude(
                 pk=self.instance.pk
             )
 
         if consulta.exists():
+
             raise forms.ValidationError(
                 "Já existe um produto cadastrado com este código. "
                 "Se for o mesmo produto com outra configuração, "
@@ -318,4 +420,3 @@ class DestinoForm(forms.ModelForm):
                 }
             ),
         }
-        
