@@ -1,6 +1,10 @@
 ﻿from django import forms
 
-from .models import Produto, Destino, Categoria
+from .models import (
+    Produto,
+    Destino,
+    Categoria,
+)
 
 
 class EntradaEstoqueForm(forms.Form):
@@ -10,9 +14,85 @@ class EntradaEstoqueForm(forms.Form):
         label="Produto"
     )
 
+    descricao = forms.CharField(
+        label="Descrição do item",
+        required=False,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 3,
+                "placeholder": (
+                    "Descrição específica deste item ou configuração."
+                )
+            }
+        )
+    )
+
+    capacidade = forms.CharField(
+        label="Capacidade",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": (
+                    "Ex.: 64 GB, 128 GB, 256 GB, 1 TB..."
+                )
+            }
+        )
+    )
+
+    memoria_ram = forms.CharField(
+        label="RAM",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": (
+                    "Ex.: 4 GB, 8 GB, 16 GB..."
+                )
+            }
+        )
+    )
+
+    condicao = forms.CharField(
+        label="Condição",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": (
+                    "Ex.: Novo, Usado, Lacrado..."
+                )
+            }
+        )
+    )
+
+    origem = forms.CharField(
+        label="Origem",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": (
+                    "Ex.: China, Índia, Não indicado..."
+                )
+            }
+        )
+    )
+
+    documento_origem = forms.CharField(
+        label="Documento de origem",
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "placeholder": "Ex.: DOC-38"
+            }
+        )
+    )
+
     quantidade = forms.IntegerField(
         label="Quantidade",
-        min_value=1
+        min_value=1,
+        widget=forms.NumberInput(
+            attrs={
+                "min": 1
+            }
+        )
     )
 
     observacao = forms.CharField(
@@ -20,7 +100,10 @@ class EntradaEstoqueForm(forms.Form):
         required=False,
         widget=forms.Textarea(
             attrs={
-                "rows": 3
+                "rows": 3,
+                "placeholder": (
+                    "Observações sobre esta entrada."
+                )
             }
         )
     )
@@ -61,11 +144,8 @@ class ProdutoForm(forms.ModelForm):
 
         fields = [
             "nome",
-            "descricao",
             "codigo",
             "tipo_produto",
-            "condicao",
-            "documento_origem",
             "categoria",
             "unidade",
             "estoque_minimo",
@@ -74,11 +154,8 @@ class ProdutoForm(forms.ModelForm):
 
         labels = {
             "nome": "Nome do produto",
-            "descricao": "Descrição / Observações",
             "codigo": "Código",
             "tipo_produto": "Tipo do produto",
-            "condicao": "Condição",
-            "documento_origem": "Documento de origem",
             "categoria": "Categoria",
             "unidade": "Unidade",
             "estoque_minimo": "Estoque mínimo",
@@ -88,46 +165,26 @@ class ProdutoForm(forms.ModelForm):
         widgets = {
             "nome": forms.TextInput(
                 attrs={
-                    "placeholder": "Nome completo do produto"
-                }
-            ),
-
-            "descricao": forms.Textarea(
-                attrs={
-                    "rows": 6,
                     "placeholder": (
-                        "Informe características, especificações "
-                        "ou outras observações do produto."
+                        "Nome base do produto"
                     )
                 }
             ),
 
             "codigo": forms.TextInput(
                 attrs={
-                    "placeholder": "Código do produto, se houver"
+                    "placeholder": (
+                        "Código do produto, se houver"
+                    )
                 }
             ),
 
             "tipo_produto": forms.TextInput(
                 attrs={
                     "placeholder": (
-                        "Ex.: Smartphone, cadeira, balança, "
-                        "veículo, ferramenta..."
+                        "Ex.: Smartphone, tablet, cadeira, "
+                        "balança, veículo, ferramenta..."
                     )
-                }
-            ),
-
-            "condicao": forms.TextInput(
-                attrs={
-                    "placeholder": (
-                        "Ex.: Novo, usado, lacrado..."
-                    )
-                }
-            ),
-
-            "documento_origem": forms.TextInput(
-                attrs={
-                    "placeholder": "Ex.: DOC-38"
                 }
             ),
 
@@ -135,7 +192,9 @@ class ProdutoForm(forms.ModelForm):
 
             "unidade": forms.TextInput(
                 attrs={
-                    "placeholder": "Ex.: UN, CX, KG, LT..."
+                    "placeholder": (
+                        "Ex.: UN, CX, KG, LT..."
+                    )
                 }
             ),
 
@@ -147,22 +206,31 @@ class ProdutoForm(forms.ModelForm):
         }
 
     def clean_codigo(self):
-        codigo = self.cleaned_data.get("codigo", "").strip()
+        codigo = self.cleaned_data.get(
+            "codigo",
+            ""
+        ).strip()
 
         if not codigo:
             return ""
 
-        consulta = Produto.objects.filter(codigo__iexact=codigo)
+        consulta = Produto.objects.filter(
+            codigo__iexact=codigo
+        )
 
-        # Ao editar, não considerar o próprio produto como duplicado.
+        # Ao editar, não considerar o próprio produto
+        # como duplicado.
         if self.instance and self.instance.pk:
-            consulta = consulta.exclude(pk=self.instance.pk)
+            consulta = consulta.exclude(
+                pk=self.instance.pk
+            )
 
         if consulta.exists():
             raise forms.ValidationError(
                 "Já existe um produto cadastrado com este código. "
-                "Se for o mesmo produto, utilize a Entrada de Estoque "
-                "para adicionar a quantidade."
+                "Se for o mesmo produto com outra configuração, "
+                "utilize a Entrada de Estoque para adicionar "
+                "a nova configuração."
             )
 
         return codigo
@@ -186,7 +254,9 @@ class CategoriaForm(forms.ModelForm):
         widgets = {
             "nome": forms.TextInput(
                 attrs={
-                    "placeholder": "Nome da categoria"
+                    "placeholder": (
+                        "Nome da categoria"
+                    )
                 }
             ),
 
@@ -248,3 +318,4 @@ class DestinoForm(forms.ModelForm):
                 }
             ),
         }
+        

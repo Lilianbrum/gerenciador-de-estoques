@@ -1,238 +1,658 @@
 {% extends "estoque/base.html" %}
 
-{% block title %}Destinos{% endblock %}
-
-{% block topbar_title %}Destinos{% endblock %}
-
 {% block content %}
 
-<div class="page-header">
-    <div>
-        <h1>Destinos</h1>
-        <p>Cadastre e gerencie os locais, órgãos, setores ou clientes que recebem produtos.</p>
-    </div>
-</div>
+<div class="container-fluid mt-4">
 
-<div class="content-grid">
+    <!-- ===================================================== -->
+    <!-- CABEÇALHO -->
+    <!-- ===================================================== -->
 
+    <div class="d-flex justify-content-between align-items-center mb-4">
 
-<div class="panel">
-
-    <div class="panel-header">
-        <h2>Novo destino</h2>
-    </div>
-
-    <form method="post">
-        {% csrf_token %}
-
-        {% if form.non_field_errors %}
-            <div class="messages">
-                {% for error in form.non_field_errors %}
-                    <div class="message error">
-                        {{ error }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
-        <div class="form-group">
-            <label for="{{ form.nome.id_for_label }}">
-                {{ form.nome.label }}
-            </label>
-
-            {{ form.nome }}
-
-            {% if form.nome.errors %}
-                <div class="field-error">
-                    {{ form.nome.errors }}
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.tipo.id_for_label }}">
-                {{ form.tipo.label }}
-            </label>
-
-            {{ form.tipo }}
-
-            {% if form.tipo.errors %}
-                <div class="field-error">
-                    {{ form.tipo.errors }}
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="form-group">
-            <label for="{{ form.descricao.id_for_label }}">
-                {{ form.descricao.label }}
-            </label>
-
-            {{ form.descricao }}
-
-            {% if form.descricao.errors %}
-                <div class="field-error">
-                    {{ form.descricao.errors }}
-                </div>
-            {% endif %}
-        </div>
-
-        <div class="form-group checkbox-group">
-            <label>
-                {{ form.ativo }}
-                {{ form.ativo.label }}
-            </label>
-
-            {% if form.ativo.errors %}
-                <div class="field-error">
-                    {{ form.ativo.errors }}
-                </div>
-            {% endif %}
-        </div>
-
-        <button type="submit" class="btn btn-primary">
-            Cadastrar destino
-        </button>
-
-    </form>
-
-</div>
-
-
-<div class="panel">
-
-    <div class="panel-header">
         <div>
-            <h2>Destinos cadastrados</h2>
-            <p>Consulte, edite ou ative/desative os destinos.</p>
+            <h1 class="mb-1">
+                Destinos
+            </h1>
+
+            <p class="text-muted mb-0">
+                Cadastre, pesquise, edite e gerencie os destinos
+                utilizados nas distribuições.
+            </p>
         </div>
+
     </div>
 
-    <form method="get" class="search-box">
 
-        <input
-            type="text"
-            name="q"
-            value="{{ termo }}"
-            placeholder="Pesquisar destino..."
-        >
+    <!-- ===================================================== -->
+    <!-- MENSAGENS DO SISTEMA -->
+    <!-- ===================================================== -->
 
-        <button type="submit" class="btn">
-            Pesquisar
-        </button>
+    {% if messages %}
 
-        {% if termo %}
-            <a href="{% url 'destinos' %}" class="btn">
-                Limpar
-            </a>
-        {% endif %}
+        {% for message in messages %}
 
-    </form>
+            <div
+                class="alert alert-{{ message.tags|default:'info' }} alert-dismissible fade show"
+                role="alert"
+            >
 
+                {{ message }}
 
-    {% if destinos %}
+                <button
+                    type="button"
+                    class="btn-close"
+                    data-bs-dismiss="alert"
+                    aria-label="Fechar"
+                ></button>
 
-        <div class="table-container">
+            </div>
 
-            <table>
-
-                <thead>
-                    <tr>
-                        <th>Destino</th>
-                        <th>Tipo</th>
-                        <th>Descrição</th>
-                        <th>Status</th>
-                        <th>Ações</th>
-                    </tr>
-                </thead>
-
-                <tbody>
-
-                    {% for destino in destinos %}
-
-                        <tr>
-
-                            <td>
-                                <strong>
-                                    {{ destino.nome }}
-                                </strong>
-                            </td>
-
-                            <td>
-                                {{ destino.tipo|default:"-" }}
-                            </td>
-
-                            <td>
-                                {{ destino.descricao|default:"-" }}
-                            </td>
-
-                            <td>
-
-                                {% if destino.ativo %}
-                                    <span class="badge badge-success">
-                                        Ativo
-                                    </span>
-                                {% else %}
-                                    <span class="badge badge-danger">
-                                        Inativo
-                                    </span>
-                                {% endif %}
-
-                            </td>
-
-                            <td>
-
-                                <div class="action-buttons">
-
-                                    <a
-                                        href="{% url 'editar_destino' destino.id %}"
-                                        class="btn btn-small"
-                                    >
-                                        Editar
-                                    </a>
-
-                                    <a
-                                        href="{% url 'alternar_destino' destino.id %}"
-                                        class="btn btn-small"
-                                    >
-                                        {% if destino.ativo %}
-                                            Desativar
-                                        {% else %}
-                                            Ativar
-                                        {% endif %}
-                                    </a>
-
-                                </div>
-
-                            </td>
-
-                        </tr>
-
-                    {% endfor %}
-
-                </tbody>
-
-            </table>
-
-        </div>
-
-    {% else %}
-
-        <div class="empty-state">
-
-            {% if termo %}
-                <p>Nenhum destino encontrado para "{{ termo }}".</p>
-            {% else %}
-                <p>Nenhum destino cadastrado.</p>
-            {% endif %}
-
-        </div>
+        {% endfor %}
 
     {% endif %}
 
+
+    <div class="row g-4">
+
+
+        <!-- ================================================= -->
+        <!-- ÁREA 1 - NOVO DESTINO -->
+        <!-- ================================================= -->
+
+        <div class="col-12 col-lg-4">
+
+            <div class="card shadow-sm h-100">
+
+                <div class="card-header">
+
+                    <h5 class="mb-0">
+                        Incluir novo destino
+                    </h5>
+
+                </div>
+
+                <div class="card-body">
+
+                    <form
+                        method="post"
+                        action="{% url 'destinos' %}"
+                    >
+
+                        {% csrf_token %}
+
+
+                        {% if form.non_field_errors %}
+
+                            <div class="alert alert-danger">
+
+                                {{ form.non_field_errors }}
+
+                            </div>
+
+                        {% endif %}
+
+
+                        <div class="mb-3">
+
+                            <label
+                                for="{{ form.nome.id_for_label }}"
+                                class="form-label"
+                            >
+                                Nome
+                            </label>
+
+                            {{ form.nome }}
+
+                            {% if form.nome.errors %}
+
+                                <div class="text-danger small mt-1">
+
+                                    {{ form.nome.errors }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label
+                                for="{{ form.tipo.id_for_label }}"
+                                class="form-label"
+                            >
+                                Tipo
+                            </label>
+
+                            {{ form.tipo }}
+
+                            {% if form.tipo.errors %}
+
+                                <div class="text-danger small mt-1">
+
+                                    {{ form.tipo.errors }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="mb-3">
+
+                            <label
+                                for="{{ form.descricao.id_for_label }}"
+                                class="form-label"
+                            >
+                                Descrição
+                            </label>
+
+                            {{ form.descricao }}
+
+                            {% if form.descricao.errors %}
+
+                                <div class="text-danger small mt-1">
+
+                                    {{ form.descricao.errors }}
+
+                                </div>
+
+                            {% endif %}
+
+                        </div>
+
+
+                        <div class="form-check mb-4">
+
+                            {{ form.ativo }}
+
+                            <label
+                                class="form-check-label"
+                                for="{{ form.ativo.id_for_label }}"
+                            >
+                                Destino ativo
+                            </label>
+
+                        </div>
+
+
+                        <button
+                            type="submit"
+                            class="btn btn-primary w-100"
+                        >
+                            + Cadastrar destino
+                        </button>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ================================================= -->
+        <!-- ÁREA 2 - BUSCA -->
+        <!-- ================================================= -->
+
+        <div class="col-12 col-lg-8">
+
+            <div class="card shadow-sm">
+
+                <div class="card-header">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <h5 class="mb-0">
+                            Pesquisar destinos
+                        </h5>
+
+                        <span
+                            id="contadorDestinos"
+                            class="badge bg-secondary"
+                        >
+                            {{ destinos|length }} destino(s)
+                        </span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-body">
+
+                    <div class="input-group">
+
+                        <span class="input-group-text">
+                            🔎
+                        </span>
+
+                        <input
+                            type="text"
+                            id="campoBuscaDestino"
+                            class="form-control"
+                            placeholder="Digite o nome do destino..."
+                            autocomplete="off"
+                        >
+
+                        <button
+                            type="button"
+                            id="botaoLimparBusca"
+                            class="btn btn-outline-secondary"
+                        >
+                            Limpar
+                        </button>
+
+                    </div>
+
+                    <div class="form-text mt-2">
+                        A busca é feita automaticamente pelo nome do destino.
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <!-- ================================================= -->
+            <!-- ÁREA 3 - LISTA DE DESTINOS -->
+            <!-- ================================================= -->
+
+            <div class="card shadow-sm mt-4">
+
+                <div class="card-header">
+
+                    <div class="d-flex justify-content-between align-items-center">
+
+                        <h5 class="mb-0">
+                            Lista de destinos
+                        </h5>
+
+                        <span
+                            id="resultadoBusca"
+                            class="text-muted small"
+                        ></span>
+
+                    </div>
+
+                </div>
+
+
+                <div class="card-body p-0">
+
+                    <div class="table-responsive">
+
+                        <table
+                            class="table table-hover align-middle mb-0"
+                            id="tabelaDestinos"
+                        >
+
+                            <thead class="table-light">
+
+                                <tr>
+
+                                    <th>
+                                        Nome
+                                    </th>
+
+                                    <th>
+                                        Tipo
+                                    </th>
+
+                                    <th>
+                                        Descrição
+                                    </th>
+
+                                    <th class="text-center">
+                                        Status
+                                    </th>
+
+                                    <th
+                                        class="text-end"
+                                        style="min-width: 190px;"
+                                    >
+                                        Ações
+                                    </th>
+
+                                </tr>
+
+                            </thead>
+
+
+                            <tbody>
+
+                                {% for destino in destinos %}
+
+                                    <tr
+                                        class="linha-destino"
+                                        data-nome="{{ destino.nome|lower }}"
+                                    >
+
+                                        <td>
+
+                                            <strong>
+                                                {{ destino.nome }}
+                                            </strong>
+
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if destino.tipo %}
+
+                                                {{ destino.tipo }}
+
+                                            {% else %}
+
+                                                <span class="text-muted">
+                                                    —
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td>
+
+                                            {% if destino.descricao %}
+
+                                                {{ destino.descricao }}
+
+                                            {% else %}
+
+                                                <span class="text-muted">
+                                                    —
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td class="text-center">
+
+                                            {% if destino.ativo %}
+
+                                                <span class="badge bg-success">
+                                                    Ativo
+                                                </span>
+
+                                            {% else %}
+
+                                                <span class="badge bg-secondary">
+                                                    Inativo
+                                                </span>
+
+                                            {% endif %}
+
+                                        </td>
+
+
+                                        <td class="text-end">
+
+                                            <div class="d-flex justify-content-end gap-2">
+
+                                                <a
+                                                    href="{% url 'editar_destino' destino.id %}"
+                                                    class="btn btn-sm btn-outline-primary"
+                                                >
+                                                    Editar
+                                                </a>
+
+
+                                                {% if destino.ativo %}
+
+                                                    <a
+                                                        href="{% url 'alternar_destino' destino.id %}"
+                                                        class="btn btn-sm btn-outline-danger"
+                                                        onclick="return confirm('Deseja realmente desativar este destino?');"
+                                                    >
+                                                        Desativar
+                                                    </a>
+
+                                                {% else %}
+
+                                                    <a
+                                                        href="{% url 'alternar_destino' destino.id %}"
+                                                        class="btn btn-sm btn-outline-success"
+                                                        onclick="return confirm('Deseja ativar este destino?');"
+                                                    >
+                                                        Ativar
+                                                    </a>
+
+                                                {% endif %}
+
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+
+                                {% empty %}
+
+                                    <tr id="linhaNenhumDestino">
+
+                                        <td
+                                            colspan="5"
+                                            class="text-center py-5"
+                                        >
+
+                                            <div class="text-muted">
+
+                                                <h5>
+                                                    Nenhum destino cadastrado
+                                                </h5>
+
+                                                <p class="mb-0">
+                                                    Utilize o formulário ao lado
+                                                    para cadastrar o primeiro destino.
+                                                </p>
+
+                                            </div>
+
+                                        </td>
+
+                                    </tr>
+
+                                {% endfor %}
+
+
+                                <tr
+                                    id="linhaNenhumResultado"
+                                    style="display: none;"
+                                >
+
+                                    <td
+                                        colspan="5"
+                                        class="text-center py-5"
+                                    >
+
+                                        <div class="text-muted">
+
+                                            <h5>
+                                                Nenhum destino encontrado
+                                            </h5>
+
+                                            <p class="mb-0">
+                                                Tente pesquisar por outro nome.
+                                            </p>
+
+                                        </div>
+
+                                    </td>
+
+                                </tr>
+
+                            </tbody>
+
+                        </table>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 
-</div>
+<!-- ========================================================= -->
+<!-- BUSCA AUTOMÁTICA -->
+<!-- ========================================================= -->
+
+<script>
+
+document.addEventListener(
+    "DOMContentLoaded",
+    function () {
+
+        const campoBusca =
+            document.getElementById(
+                "campoBuscaDestino"
+            );
+
+        const botaoLimpar =
+            document.getElementById(
+                "botaoLimparBusca"
+            );
+
+        const linhas =
+            document.querySelectorAll(
+                ".linha-destino"
+            );
+
+        const resultadoBusca =
+            document.getElementById(
+                "resultadoBusca"
+            );
+
+        const contador =
+            document.getElementById(
+                "contadorDestinos"
+            );
+
+        const linhaNenhumResultado =
+            document.getElementById(
+                "linhaNenhumResultado"
+            );
+
+
+        function atualizarLista() {
+
+            const termo =
+                campoBusca.value
+                    .trim()
+                    .toLowerCase();
+
+
+            let encontrados = 0;
+
+
+            linhas.forEach(
+                function (linha) {
+
+                    const nome =
+                        linha.dataset.nome || "";
+
+
+                    if (
+                        termo === "" ||
+                        nome.includes(termo)
+                    ) {
+
+                        linha.style.display = "";
+
+                        encontrados++;
+
+                    } else {
+
+                        linha.style.display = "none";
+
+                    }
+
+                }
+            );
+
+
+            if (termo === "") {
+
+                resultadoBusca.textContent = "";
+
+            } else {
+
+                resultadoBusca.textContent =
+                    encontrados +
+                    " resultado(s) encontrado(s)";
+
+            }
+
+
+            if (
+                linhaNenhumResultado &&
+                linhas.length > 0
+            ) {
+
+                if (encontrados === 0) {
+
+                    linhaNenhumResultado.style.display =
+                        "";
+
+                } else {
+
+                    linhaNenhumResultado.style.display =
+                        "none";
+
+                }
+
+            }
+
+
+            if (contador) {
+
+                contador.textContent =
+                    encontrados +
+                    " destino(s)";
+
+            }
+
+        }
+
+
+        campoBusca.addEventListener(
+            "input",
+            atualizarLista
+        );
+
+
+        botaoLimpar.addEventListener(
+            "click",
+            function () {
+
+                campoBusca.value = "";
+
+                atualizarLista();
+
+                campoBusca.focus();
+
+            }
+        );
+
+
+        atualizarLista();
+
+    }
+);
+
+</script>
 
 {% endblock %}

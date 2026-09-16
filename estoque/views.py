@@ -3,7 +3,7 @@ from collections import defaultdict
 
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
-from django.db import models
+from django.db import models, transaction
 from django.shortcuts import redirect, render, get_object_or_404
 from django.utils import timezone
 
@@ -20,6 +20,7 @@ from .models import (
     Categoria,
     Destino,
     Movimentacao,
+    ConfiguracaoEstoque,
 )
 
 
@@ -61,7 +62,8 @@ def dashboard(request):
         .select_related(
             "produto",
             "destino",
-            "usuario"
+            "usuario",
+            "configuracao",
         )
         .order_by("-criado_em")[:10]
     )
@@ -78,12 +80,15 @@ def dashboard(request):
         ).replace(day=1)
 
         if primeiro_dia.month == 12:
+
             proximo_mes = primeiro_dia.replace(
                 year=primeiro_dia.year + 1,
                 month=1,
                 day=1
             )
+
         else:
+
             proximo_mes = primeiro_dia.replace(
                 month=primeiro_dia.month + 1,
                 day=1
@@ -311,14 +316,6 @@ def produtos(request):
         .order_by("tipo_produto")
     )
 
-    # ========================================================
-    # CONDIÇÕES
-    # Não usamos Produto.Condicao para evitar dependência
-    # de uma classe interna que pode não existir no modelo.
-    # Os valores correspondem aos valores atualmente usados
-    # pelo campo condicao.
-    # ========================================================
-
     condicoes = [
         ("NOVO", "Novo"),
         ("USADO", "Usado"),
@@ -327,25 +324,15 @@ def produtos(request):
 
     context = {
         "produtos": produtos_qs,
-
         "categorias": categorias_lista,
-
         "tipos": tipos_lista,
-
         "condicoes": condicoes,
-
         "quantidade_total": quantidade_total,
-
         "produtos_estoque_baixo": produtos_estoque_baixo,
-
         "produtos_ativos": produtos_ativos,
-
         "q": busca,
-
         "categoria_selecionada": categoria_id,
-
         "tipo_selecionado": tipo,
-
         "condicao_selecionada": condicao,
     }
 
@@ -355,10 +342,6 @@ def produtos(request):
         context
     )
 
-
-# ============================================================
-# NOVO PRODUTO
-# ============================================================
 
 @login_required
 def novo_produto(request):
@@ -392,10 +375,6 @@ def novo_produto(request):
         }
     )
 
-
-# ============================================================
-# EDITAR PRODUTO
-# ============================================================
 
 @login_required
 def editar_produto(
@@ -504,6 +483,36 @@ def entrada_estoque(request):
                 "produto"
             ]
 
+            descricao = form.cleaned_data.get(
+                "descricao",
+                ""
+            ).strip()
+
+            capacidade = form.cleaned_data.get(
+                "capacidade",
+                ""
+            ).strip()
+
+            memoria_ram = form.cleaned_data.get(
+                "memoria_ram",
+                ""
+            ).strip()
+
+            condicao = form.cleaned_data.get(
+                "condicao",
+                ""
+            ).strip()
+
+            origem = form.cleaned_data.get(
+                "origem",
+                ""
+            ).strip()
+
+            documento_origem = form.cleaned_data.get(
+                "documento_origem",
+                ""
+            ).strip()
+
             quantidade = form.cleaned_data[
                 "quantidade"
             ]
@@ -512,22 +521,69 @@ def entrada_estoque(request):
                 "observacao"
             ]
 
-            produto.estoque_atual += quantidade
+            with transaction.atomic():
 
-            produto.save()
+                configuracao, criada = (
+                    ConfiguracaoEstoque.objects.get_or_create(
+                        produto=produto,
+                        descricao=descricao,
+                        capacidade=capacidade,
+                        memoria_ram=memoria_ram,
+                        condicao=condicao,
+                        origem=origem,
+                        documento_origem=documento_origem,
+                        defaults={
+                            "quantidade": 0,
+                            "observacao": observacao,
+                            "ativo": True,
+                        }
+                    )
+                )
 
-            Movimentacao.objects.create(
-                produto=produto,
-                tipo="E",
-                quantidade=quantidade,
-                observacao=observacao,
-                usuario=request.user,
-            )
+                configuracao.quantidade += quantidade
+
+                if observacao:
+                    configuracao.observacao = observacao
+
+                configuracao.ativo = True
+
+                configuracao.save()
+
+                produto.estoque_atual += quantidade
+
+                produto.save(
+                    update_fields=[
+                        "estoque_atual",
+                        "atualizado_em",
+                    ]
+                )
+
+                Movimentacao.objects.create(
+                    produto=produto,
+                    configuracao=configuracao,
+                    tipo="E",
+                    quantidade=quantidade,
+                    observacao=observacao,
+                    usuario=request.user,
+                )
+
+            if criada:
+
+                mensagem_configuracao = (
+                    " e uma nova configuração foi criada"
+                )
+
+            else:
+
+                mensagem_configuracao = (
+                    " e a configuração existente foi atualizada"
+                )
 
             messages.success(
                 request,
                 f"Entrada de {quantidade} unidade(s) "
-                f"de {produto.nome} registrada com sucesso."
+                f"de {produto.nome} registrada com sucesso"
+                f"{mensagem_configuracao}."
             )
 
             return redirect(
@@ -590,7 +646,12 @@ def saida_estoque(request):
 
                 produto.estoque_atual -= quantidade
 
-                produto.save()
+                produto.save(
+                    update_fields=[
+                        "estoque_atual",
+                        "atualizado_em",
+                    ]
+                )
 
                 Movimentacao.objects.create(
                     produto=produto,
@@ -626,7 +687,7 @@ def saida_estoque(request):
 
 
 # ============================================================
-# HISTÓRICO
+# HISTÓRICO DE MOVIMENTAÇÕES
 # ============================================================
 
 @login_required
@@ -637,7 +698,8 @@ def historico_movimentacoes(request):
         .select_related(
             "produto",
             "destino",
-            "usuario"
+            "usuario",
+            "configuracao",
         )
         .order_by("-criado_em")
     )
@@ -715,15 +777,10 @@ def historico_movimentacoes(request):
 
     context = {
         "movimentacoes": movimentacoes,
-
         "produtos": produtos_lista,
-
         "tipo_selecionado": tipo,
-
         "produto_selecionado": produto_id,
-
         "data_inicio": data_inicio,
-
         "data_fim": data_fim,
     }
 
@@ -777,10 +834,6 @@ def destinos(request):
     )
 
 
-# ============================================================
-# EDITAR DESTINO
-# ============================================================
-
 @login_required
 def editar_destino(
     request,
@@ -827,10 +880,6 @@ def editar_destino(
         }
     )
 
-
-# ============================================================
-# ATIVAR / DESATIVAR DESTINO
-# ============================================================
 
 @login_required
 def alternar_destino(
@@ -881,7 +930,8 @@ def distribuicoes(request):
         .select_related(
             "produto",
             "destino",
-            "usuario"
+            "usuario",
+            "configuracao",
         )
         .order_by("-criado_em")
     )
@@ -992,23 +1042,14 @@ def distribuicoes(request):
 
     context = {
         "distribuicoes": distribuicoes_qs,
-
         "total_registros": total_registros,
-
         "total_itens": total_itens,
-
         "destinos": destinos_lista,
-
         "produtos": produtos_lista,
-
         "q": busca,
-
         "destino_selecionado": destino_id,
-
         "produto_selecionado": produto_id,
-
         "data_inicio": data_inicio,
-
         "data_fim": data_fim,
     }
 

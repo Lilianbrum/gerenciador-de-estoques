@@ -1,7 +1,11 @@
 from django.db import transaction
 from django.core.exceptions import ValidationError
 
-from .models import Produto, Movimentacao
+from .models import (
+    Produto,
+    ConfiguracaoEstoque,
+    Movimentacao,
+)
 
 
 @transaction.atomic
@@ -9,26 +13,63 @@ def registrar_entrada(
     produto,
     quantidade,
     usuario,
-    observacao=""
+    descricao="",
+    capacidade="",
+    memoria_ram="",
+    condicao="",
+    origem="",
+    documento_origem="",
+    observacao="",
 ):
     if quantidade <= 0:
         raise ValidationError(
             "A quantidade deve ser maior que zero."
         )
 
+    configuracao, criada = (
+        ConfiguracaoEstoque.objects.get_or_create(
+            produto=produto,
+            descricao=descricao,
+            capacidade=capacidade,
+            memoria_ram=memoria_ram,
+            condicao=condicao,
+            origem=origem,
+            documento_origem=documento_origem,
+            defaults={
+                "quantidade": 0,
+                "observacao": observacao,
+                "ativo": True,
+            },
+        )
+    )
+
+    configuracao.quantidade += quantidade
+
+    if observacao:
+        configuracao.observacao = observacao
+
+    configuracao.ativo = True
+    configuracao.save()
+
     produto.estoque_atual += quantidade
 
     produto.save(
-        update_fields=["estoque_atual"]
+        update_fields=[
+            "estoque_atual",
+            "atualizado_em",
+        ]
     )
 
-    return Movimentacao.objects.create(
+    movimentacao = Movimentacao.objects.create(
         produto=produto,
-        tipo=Movimentacao.Tipo.ENTRADA,
+        configuracao=configuracao,
+        tipo="E",
         quantidade=quantidade,
         usuario=usuario,
         observacao=observacao,
     )
+
+    return movimentacao
 
 
 @transaction.atomic
@@ -37,7 +78,7 @@ def registrar_saida(
     quantidade,
     usuario,
     destino,
-    observacao=""
+    observacao="",
 ):
     if quantidade <= 0:
         raise ValidationError(
@@ -52,12 +93,15 @@ def registrar_saida(
     produto.estoque_atual -= quantidade
 
     produto.save(
-        update_fields=["estoque_atual"]
+        update_fields=[
+            "estoque_atual",
+            "atualizado_em",
+        ]
     )
 
     return Movimentacao.objects.create(
         produto=produto,
-        tipo=Movimentacao.Tipo.SAIDA,
+        tipo="S",
         quantidade=quantidade,
         destino=destino,
         usuario=usuario,

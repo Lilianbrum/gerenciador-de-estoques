@@ -10,55 +10,55 @@ Entrada de estoque
 
 <div class="page-header">
 
-
-<div>
-    <h1>Entrada de estoque</h1>
-    <p>
-        Registre a entrada de produtos no estoque.
-    </p>
-</div>
-
-<div>
-    <a href="{% url 'produtos' %}" class="btn">
-        Consultar produtos
-    </a>
-</div>
-
-
-</div>
-
-<div class="panel">
-
-
-<div class="panel-header">
-
     <div>
-        <h2>Registrar entrada</h2>
+        <h1>Entrada de estoque</h1>
 
         <p>
-            Informe o produto e a quantidade recebida.
+            Registre a entrada de produtos e informe a configuração
+            específica dos itens recebidos.
         </p>
+    </div>
+
+    <div>
+        <a href="{% url 'produtos' %}" class="btn">
+            Consultar produtos
+        </a>
     </div>
 
 </div>
 
 
-<form method="post">
+<div class="panel">
 
-    {% csrf_token %}
+    <div class="panel-header">
 
+        <div>
+            <h2>Registrar entrada</h2>
 
-    {% if form.non_field_errors %}
-
-        <div class="message message-error">
-            {{ form.non_field_errors }}
+            <p>
+                Selecione o produto base e informe os detalhes
+                específicos desta entrada.
+            </p>
         </div>
 
-    {% endif %}
+    </div>
 
 
-    <div class="form-grid">
+    <form method="post">
 
+        {% csrf_token %}
+
+
+        {% if form.non_field_errors %}
+
+            <div class="message message-error">
+                {{ form.non_field_errors }}
+            </div>
+
+        {% endif %}
+
+
+        <!-- PRODUTO -->
 
         <div class="form-group">
 
@@ -77,6 +77,122 @@ Entrada de estoque
         </div>
 
 
+        <!-- CONFIGURAÇÃO -->
+
+        <div class="form-grid">
+
+
+            <div class="form-group">
+
+                <label for="{{ form.capacidade.id_for_label }}">
+                    Capacidade
+                </label>
+
+                {{ form.capacidade }}
+
+                {% if form.capacidade.errors %}
+                    <div class="field-error">
+                        {{ form.capacidade.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.memoria_ram.id_for_label }}">
+                    RAM
+                </label>
+
+                {{ form.memoria_ram }}
+
+                {% if form.memoria_ram.errors %}
+                    <div class="field-error">
+                        {{ form.memoria_ram.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.condicao.id_for_label }}">
+                    Condição
+                </label>
+
+                {{ form.condicao }}
+
+                {% if form.condicao.errors %}
+                    <div class="field-error">
+                        {{ form.condicao.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+            <div class="form-group">
+
+                <label for="{{ form.origem.id_for_label }}">
+                    Origem
+                </label>
+
+                {{ form.origem }}
+
+                {% if form.origem.errors %}
+                    <div class="field-error">
+                        {{ form.origem.errors }}
+                    </div>
+                {% endif %}
+
+            </div>
+
+
+        </div>
+
+
+        <!-- DESCRIÇÃO -->
+
+        <div class="form-group">
+
+            <label for="{{ form.descricao.id_for_label }}">
+                Descrição do item
+            </label>
+
+            {{ form.descricao }}
+
+            {% if form.descricao.errors %}
+                <div class="field-error">
+                    {{ form.descricao.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- DOCUMENTO -->
+
+        <div class="form-group">
+
+            <label for="{{ form.documento_origem.id_for_label }}">
+                Documento de origem
+            </label>
+
+            {{ form.documento_origem }}
+
+            {% if form.documento_origem.errors %}
+                <div class="field-error">
+                    {{ form.documento_origem.errors }}
+                </div>
+            {% endif %}
+
+        </div>
+
+
+        <!-- QUANTIDADE -->
+
         <div class="form-group">
 
             <label for="{{ form.quantidade.id_for_label }}">
@@ -94,93 +210,134 @@ Entrada de estoque
         </div>
 
 
-    </div>
+        <!-- OBSERVAÇÃO -->
+
+        <div class="form-group">
+
+            <label for="{{ form.observacao.id_for_label }}">
+                Observação
+            </label>
+
+            {{ form.observacao }}
+
+            {% if form.observacao.errors %}
+                <div class="field-error">
+                    {{ form.observacao.errors }}
+                </div>
+            {% endif %}
+
+        </div>
 
 
-    <div class="form-group">
+        <!-- AÇÕES -->
 
-        <label for="{{ form.observacao.id_for_label }}">
-            Observação
-        </label>
+        <div class="form-actions">
 
-        {{ form.observacao }}
-
-        {% if form.observacao.errors %}
-            <div class="field-error">
-                {{ form.observacao.errors }}
-            </div>
-        {% endif %}
-
-    </div>
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Registrar entrada
+            </button>
 
 
-    <div class="form-actions">
+            <a
+                href="{% url 'dashboard' %}"
+                class="btn"
+            >
+                Cancelar
+            </a>
 
-        <button
-            type="submit"
-            class="btn btn-primary"
-        >
-            Registrar entrada
-        </button>
+        </div>
 
-        <a
-            href="{% url 'dashboard' %}"
-            class="btn"
-        >
-            Cancelar
-        </a>
 
-    </div>
-
-</form>
-
+    </form>
 
 </div>
+
 
 <div class="panel">
 
+    <div class="panel-header">
 
-<div class="panel-header">
+        <div>
 
-    <div>
-        <h2>Como funciona</h2>
+            <h2>Como funciona</h2>
 
-        <p>
-            A entrada aumenta automaticamente a quantidade
-            disponível do produto.
-        </p>
-    </div>
+            <p>
+                O produto é o cadastro base. Os detalhes abaixo
+                identificam a configuração específica que está
+                entrando no estoque.
+            </p>
 
-</div>
+        </div>
 
-
-<div class="info-grid">
-
-    <div class="info-item">
-        <strong>1. Produto</strong>
-        <span>
-            Selecione o produto que está sendo recebido.
-        </span>
     </div>
 
 
-    <div class="info-item">
-        <strong>2. Quantidade</strong>
-        <span>
-            Informe quantas unidades entraram no estoque.
-        </span>
+    <div class="info-grid">
+
+
+        <div class="info-item">
+
+            <strong>1. Produto</strong>
+
+            <span>
+                Selecione o produto base já cadastrado.
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <strong>2. Configuração</strong>
+
+            <span>
+                Informe capacidade, RAM, condição, origem e
+                demais características específicas do item.
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <strong>3. Documento</strong>
+
+            <span>
+                Informe o documento de origem quando houver,
+                como DOC-38.
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <strong>4. Quantidade</strong>
+
+            <span>
+                Informe quantas unidades dessa configuração
+                entraram no estoque.
+            </span>
+
+        </div>
+
+
+        <div class="info-item">
+
+            <strong>5. Observação</strong>
+
+            <span>
+                Registre informações adicionais sobre esta
+                entrada.
+            </span>
+
+        </div>
+
+
     </div>
-
-
-    <div class="info-item">
-        <strong>3. Observação</strong>
-        <span>
-            Registre informações adicionais, se necessário.
-        </span>
-    </div>
-
-</div>
-
 
 </div>
 
