@@ -1,575 +1,394 @@
+@'
 {% extends "estoque/base.html" %}
 
-{% block title %}Dashboard - Gerenciador de Estoques{% endblock %}
+{% block title %}Dashboard{% endblock %}
 
-{% block extra_css %}
-<style>
-    .dashboard {
-        max-width: 1500px;
-        margin: 0 auto;
-    }
-
-    .header {
-        margin-bottom: 25px;
-    }
-
-    .header h1 {
-        margin: 0 0 8px 0;
-        font-size: 30px;
-    }
-
-    .header p {
-        margin: 0;
-        color: #6b7280;
-        font-size: 15px;
-    }
-
-    .cards {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 18px;
-        margin-bottom: 25px;
-    }
-
-    .card {
-        background: white;
-        border-radius: 12px;
-        padding: 22px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-        border: 1px solid #e5e7eb;
-    }
-
-    .card-title {
-        font-size: 14px;
-        color: #6b7280;
-        margin-bottom: 10px;
-    }
-
-    .card-value {
-        font-size: 30px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    .card-description {
-        font-size: 13px;
-        color: #9ca3af;
-    }
-
-    .charts-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr;
-        gap: 20px;
-        margin-bottom: 25px;
-    }
-
-    .chart-card {
-        background: white;
-        border-radius: 12px;
-        padding: 22px;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    }
-
-    .chart-title {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 5px;
-    }
-
-    .chart-description {
-        font-size: 13px;
-        color: #6b7280;
-        margin-bottom: 18px;
-    }
-
-    .chart-container {
-        position: relative;
-        height: 320px;
-    }
-
-    .tables-grid {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 20px;
-        margin-bottom: 25px;
-    }
-
-    .table-card {
-        background: white;
-        border-radius: 12px;
-        padding: 22px;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    }
-
-    .section-title {
-        font-size: 18px;
-        font-weight: bold;
-        margin-bottom: 18px;
-    }
-
-    .table-card table,
-    .movimentacoes table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    .table-card th,
-    .movimentacoes th {
-        text-align: left;
-        font-size: 12px;
-        color: #6b7280;
-        text-transform: uppercase;
-        padding: 10px 8px;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    .table-card td,
-    .movimentacoes td {
-        padding: 11px 8px;
-        border-bottom: 1px solid #f0f0f0;
-        font-size: 14px;
-    }
-
-    .table-card tr:last-child td,
-    .movimentacoes tr:last-child td {
-        border-bottom: none;
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 5px 9px;
-        border-radius: 20px;
-        font-size: 12px;
-        font-weight: bold;
-    }
-
-    .badge-danger {
-        background: #fee2e2;
-        color: #991b1b;
-    }
-
-    .badge-warning {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .badge-success {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .badge-info {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-
-    .empty {
-        padding: 30px;
-        text-align: center;
-        color: #9ca3af;
-        font-size: 14px;
-    }
-
-    .movimentacoes {
-        background: white;
-        border-radius: 12px;
-        padding: 22px;
-        border: 1px solid #e5e7eb;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    }
-
-    .movimentacao-entrada {
-        color: #166534;
-        font-weight: bold;
-    }
-
-    .movimentacao-saida {
-        color: #991b1b;
-        font-weight: bold;
-    }
-
-    .movimentacao-ajuste {
-        color: #92400e;
-        font-weight: bold;
-    }
-
-    @media (max-width: 1100px) {
-        .cards {
-            grid-template-columns: repeat(2, 1fr);
-        }
-
-        .charts-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .tables-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
-    @media (max-width: 650px) {
-        .cards {
-            grid-template-columns: 1fr;
-        }
-
-        .card-value {
-            font-size: 25px;
-        }
-
-        .chart-container {
-            height: 260px;
-        }
-
-        .table-card th,
-        .table-card td,
-        .movimentacoes th,
-        .movimentacoes td {
-            padding: 8px 5px;
-        }
-    }
-</style>
-{% endblock %}
-
-
-{% block topbar_title %}
-Dashboard
-{% endblock %}
-
+{% block topbar_title %}Dashboard{% endblock %}
 
 {% block content %}
 
-<div class="dashboard">
+<style>
+.dashboard-header {
+    margin-bottom: 24px;
+}
 
-    <div class="header">
-        <h1>Dashboard</h1>
+.dashboard-header h1 {
+    margin: 0 0 6px 0;
+}
 
-        <p>
-            Visão geral do estoque, movimentações e distribuições.
-        </p>
+.dashboard-header p {
+    margin: 0;
+    color: #6b7280;
+}
+
+.dashboard-cards {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    margin-bottom: 24px;
+}
+
+.dashboard-card {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.dashboard-card-title {
+    color: #6b7280;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.dashboard-card-value {
+    font-size: 30px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.dashboard-card-description {
+    color: #9ca3af;
+    font-size: 13px;
+}
+
+.dashboard-charts {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.dashboard-tables {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    margin-bottom: 24px;
+}
+
+.dashboard-panel {
+    background: #fff;
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    padding: 22px;
+    box-shadow: 0 2px 8px rgba(0,0,0,.05);
+}
+
+.dashboard-panel-title {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 5px;
+}
+
+.dashboard-panel-description {
+    color: #6b7280;
+    font-size: 13px;
+    margin-bottom: 18px;
+}
+
+.chart-container {
+    position: relative;
+    height: 320px;
+}
+
+.dashboard-no-chart {
+    height: 320px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    color: #6b7280;
+}
+
+.dashboard-no-chart-icon {
+    font-size: 42px;
+    margin-bottom: 12px;
+}
+
+.dashboard-no-chart-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: #374151;
+    margin-bottom: 6px;
+}
+
+.dashboard-no-chart-text {
+    font-size: 13px;
+    color: #9ca3af;
+    max-width: 320px;
+}
+
+.dashboard-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.dashboard-table th {
+    text-align: left;
+    font-size: 12px;
+    color: #6b7280;
+    text-transform: uppercase;
+    padding: 10px 8px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.dashboard-table td {
+    padding: 11px 8px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+}
+
+.dashboard-table tr:last-child td {
+    border-bottom: none;
+}
+
+.dashboard-empty {
+    text-align: center;
+    color: #9ca3af;
+    padding: 30px 15px;
+}
+
+.dashboard-badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 700;
+}
+
+.dashboard-badge-danger {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.dashboard-badge-warning {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.dashboard-badge-success {
+    background: #dcfce7;
+    color: #166534;
+}
+
+.dashboard-full-panel {
+    margin-bottom: 24px;
+}
+
+@media (max-width: 1100px) {
+    .dashboard-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .dashboard-charts {
+        grid-template-columns: 1fr;
+    }
+
+    .dashboard-tables {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .dashboard-cards {
+        grid-template-columns: 1fr;
+    }
+
+    .chart-container {
+        height: 260px;
+    }
+
+    .dashboard-no-chart {
+        height: 260px;
+    }
+}
+</style>
+
+
+<div class="dashboard-header">
+
+    <h1>Dashboard</h1>
+
+    <p>
+        Visão geral do estoque, movimentações e distribuições.
+    </p>
+
+</div>
+
+
+<div class="dashboard-cards">
+
+    <div class="dashboard-card">
+        <div class="dashboard-card-title">
+            Produtos ativos
+        </div>
+
+        <div class="dashboard-card-value">
+            {{ produtos_ativos }}
+        </div>
+
+        <div class="dashboard-card-description">
+            Produtos disponíveis no sistema
+        </div>
     </div>
 
 
-    <!-- CARDS -->
-
-    <div class="cards">
-
-        <div class="card">
-
-            <div class="card-title">
-                Produtos ativos
-            </div>
-
-            <div class="card-value">
-                {{ total_produtos }}
-            </div>
-
-            <div class="card-description">
-                Produtos cadastrados e ativos
-            </div>
-
+    <div class="dashboard-card">
+        <div class="dashboard-card-title">
+            Produtos inativos
         </div>
 
-
-        <div class="card">
-
-            <div class="card-title">
-                Itens em estoque
-            </div>
-
-            <div class="card-value">
-                {{ quantidade_total }}
-            </div>
-
-            <div class="card-description">
-                Quantidade disponível atualmente
-            </div>
-
+        <div class="dashboard-card-value">
+            {{ produtos_inativos }}
         </div>
 
+        <div class="dashboard-card-description">
+            Produtos desativados
+        </div>
+    </div>
 
-        <div class="card">
 
-            <div class="card-title">
-                Itens distribuídos
-            </div>
+    <div class="dashboard-card">
+        <div class="dashboard-card-title">
+            Itens em estoque
+        </div>
 
-            <div class="card-value">
-                {{ total_itens_distribuidos }}
-            </div>
+        <div class="dashboard-card-value">
+            {{ quantidade_total }}
+        </div>
 
-            <div class="card-description">
-                Total de itens já distribuídos
-            </div>
+        <div class="dashboard-card-description">
+            Quantidade disponível atualmente
+        </div>
+    </div>
 
+
+    <div class="dashboard-card">
+        <div class="dashboard-card-title">
+            Estoque baixo
+        </div>
+
+        <div class="dashboard-card-value">
+            {{ produtos_estoque_baixo|length }}
+        </div>
+
+        <div class="dashboard-card-description">
+            Produtos no limite ou abaixo do mínimo
+        </div>
+    </div>
+
+</div>
+
+
+<div class="dashboard-charts">
+
+
+    <div class="dashboard-panel">
+
+        <div class="dashboard-panel-title">
+            Entradas × Saídas
+        </div>
+
+        <div class="dashboard-panel-description">
+            Movimentações dos últimos 6 meses
+        </div>
+
+        <div class="chart-container">
+            <canvas id="movimentacoesChart"></canvas>
         </div>
 
     </div>
 
 
-    <!-- GRÁFICOS -->
+    <div class="dashboard-panel">
 
-    <div class="charts-grid">
-
-        <div class="chart-card">
-
-            <div class="chart-title">
-                Entradas × Saídas
-            </div>
-
-            <div class="chart-description">
-                Movimentação dos últimos 6 meses
-            </div>
-
-            <div class="chart-container">
-                <canvas id="movimentacoesChart"></canvas>
-            </div>
-
+        <div class="dashboard-panel-title">
+            Estoque por categoria
         </div>
 
+        <div class="dashboard-panel-description">
+            Distribuição atual dos itens
+        </div>
 
-        <div class="chart-card">
-
-            <div class="chart-title">
-                Estoque por categoria
-            </div>
-
-            <div class="chart-description">
-                Distribuição atual do estoque
-            </div>
+        {% if estoque_categoria_lista %}
 
             <div class="chart-container">
                 <canvas id="categoriasChart"></canvas>
             </div>
 
-        </div>
+        {% else %}
+
+            <div class="dashboard-no-chart">
+
+                <div class="dashboard-no-chart-icon">
+                    📦
+                </div>
+
+                <div class="dashboard-no-chart-title">
+                    Nenhum item em estoque
+                </div>
+
+                <div class="dashboard-no-chart-text">
+                    Quando houver produtos em estoque,
+                    a distribuição por categoria aparecerá
+                    automaticamente neste gráfico.
+                </div>
+
+            </div>
+
+        {% endif %}
 
     </div>
 
-
-    <!-- RANKINGS -->
-
-    <div class="tables-grid">
+</div>
 
 
-        <!-- MAIOR ESTOQUE -->
+<div class="dashboard-tables">
 
-        <div class="table-card">
 
-            <div class="section-title">
-                Produtos com maior estoque
-            </div>
+    <div class="dashboard-panel">
 
-            {% if produtos_maior_estoque %}
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-                            <th>Produto</th>
-                            <th>Categoria</th>
-                            <th>Condição</th>
-                            <th>Quantidade</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        {% for produto in produtos_maior_estoque %}
-
-                            <tr>
-
-                                <td>
-                                    {{ produto.nome }}
-                                </td>
-
-                                <td>
-                                    {{ produto.categoria.nome }}
-                                </td>
-
-                                <td>
-                                    {% if produto.condicao %}
-                                        {{ produto.condicao }}
-                                    {% else %}
-                                        —
-                                    {% endif %}
-                                </td>
-
-                                <td>
-                                    <strong>
-                                        {{ produto.estoque_atual }}
-                                    </strong>
-
-                                    {{ produto.unidade }}
-                                </td>
-
-                            </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            {% else %}
-
-                <div class="empty">
-                    Nenhum produto cadastrado.
-                </div>
-
-            {% endif %}
-
+        <div class="dashboard-panel-title">
+            Produtos com maior estoque
         </div>
 
-
-        <!-- DISTRIBUIÇÕES POR DESTINO -->
-
-        <div class="table-card">
-
-            <div class="section-title">
-                Distribuições por destino
-            </div>
-
-            {% if distribuicoes_destino_lista %}
-
-                <table>
-
-                    <thead>
-
-                        <tr>
-                            <th>Destino</th>
-                            <th>Quantidade</th>
-                        </tr>
-
-                    </thead>
-
-                    <tbody>
-
-                        {% for item in distribuicoes_destino_lista %}
-
-                            <tr>
-
-                                <td>
-                                    {{ item.destino }}
-                                </td>
-
-                                <td>
-                                    <strong>
-                                        {{ item.quantidade }}
-                                    </strong>
-                                </td>
-
-                            </tr>
-
-                        {% endfor %}
-
-                    </tbody>
-
-                </table>
-
-            {% else %}
-
-                <div class="empty">
-                    Ainda não existem distribuições registradas.
-                </div>
-
-            {% endif %}
-
+        <div class="dashboard-panel-description">
+            Produtos ativos com maior quantidade disponível
         </div>
 
-    </div>
+        {% if produtos_maior_estoque %}
 
-
-    <!-- ÚLTIMAS MOVIMENTAÇÕES -->
-
-    <div class="movimentacoes">
-
-        <div class="section-title">
-            Últimas movimentações
-        </div>
-
-
-        {% if ultimas_movimentacoes %}
-
-            <table>
+            <table class="dashboard-table">
 
                 <thead>
-
                     <tr>
-                        <th>Data</th>
                         <th>Produto</th>
-                        <th>Tipo</th>
+                        <th>Categoria</th>
                         <th>Quantidade</th>
-                        <th>Destino</th>
-                        <th>Usuário</th>
                     </tr>
-
                 </thead>
-
 
                 <tbody>
 
-                    {% for movimentacao in ultimas_movimentacoes %}
+                    {% for produto in produtos_maior_estoque %}
 
                         <tr>
 
                             <td>
-                                {{ movimentacao.criado_em|date:"d/m/Y H:i" }}
+                                {{ produto.nome }}
                             </td>
 
                             <td>
-                                {{ movimentacao.produto.nome }}
-                            </td>
-
-                            <td>
-
-                                {% if movimentacao.tipo == "E" %}
-
-                                    <span class="badge badge-success">
-                                        Entrada
-                                    </span>
-
-                                {% elif movimentacao.tipo == "S" %}
-
-                                    <span class="badge badge-danger">
-                                        Saída
-                                    </span>
-
-                                {% else %}
-
-                                    <span class="badge badge-warning">
-                                        Ajuste
-                                    </span>
-
-                                {% endif %}
-
+                                {{ produto.categoria.nome }}
                             </td>
 
                             <td>
                                 <strong>
-                                    {{ movimentacao.quantidade }}
+                                    {{ produto.estoque_atual }}
                                 </strong>
-                            </td>
-
-                            <td>
-
-                                {% if movimentacao.destino %}
-
-                                    {{ movimentacao.destino.nome }}
-
-                                {% else %}
-
-                                    —
-
-                                {% endif %}
-
-                            </td>
-
-                            <td>
-                                {{ movimentacao.usuario.username }}
+                                {{ produto.unidade }}
                             </td>
 
                         </tr>
@@ -580,11 +399,66 @@ Dashboard
 
             </table>
 
+        {% else %}
+
+            <div class="dashboard-empty">
+                Nenhum produto cadastrado.
+            </div>
+
+        {% endif %}
+
+    </div>
+
+
+    <div class="dashboard-panel">
+
+        <div class="dashboard-panel-title">
+            Distribuições por destino
+        </div>
+
+        <div class="dashboard-panel-description">
+            Total de itens enviados para cada destino
+        </div>
+
+        {% if distribuicoes_destino_lista %}
+
+            <table class="dashboard-table">
+
+                <thead>
+                    <tr>
+                        <th>Destino</th>
+                        <th>Quantidade</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for item in distribuicoes_destino_lista %}
+
+                        <tr>
+
+                            <td>
+                                {{ item.destino }}
+                            </td>
+
+                            <td>
+                                <strong>
+                                    {{ item.quantidade }}
+                                </strong>
+                            </td>
+
+                        </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
 
         {% else %}
 
-            <div class="empty">
-                Nenhuma movimentação registrada ainda.
+            <div class="dashboard-empty">
+                Ainda não existem distribuições registradas.
             </div>
 
         {% endif %}
@@ -594,175 +468,339 @@ Dashboard
 </div>
 
 
+<div class="dashboard-panel dashboard-full-panel">
+
+    <div class="dashboard-panel-title">
+        ⚠️ Alertas de estoque
+    </div>
+
+    <div class="dashboard-panel-description">
+        Produtos no limite ou abaixo do estoque mínimo
+    </div>
+
+    {% if produtos_estoque_baixo %}
+
+        <table class="dashboard-table">
+
+            <thead>
+                <tr>
+                    <th>Produto</th>
+                    <th>Categoria</th>
+                    <th>Estoque atual</th>
+                    <th>Estoque mínimo</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for produto in produtos_estoque_baixo %}
+
+                    <tr>
+
+                        <td>
+                            <strong>
+                                {{ produto.nome }}
+                            </strong>
+                        </td>
+
+                        <td>
+                            {{ produto.categoria.nome }}
+                        </td>
+
+                        <td>
+                            {{ produto.estoque_atual }}
+                        </td>
+
+                        <td>
+                            {{ produto.estoque_minimo }}
+                        </td>
+
+                        <td>
+
+                            {% if produto.estoque_atual == 0 %}
+
+                                <span class="dashboard-badge dashboard-badge-danger">
+                                    Sem estoque
+                                </span>
+
+                            {% else %}
+
+                                <span class="dashboard-badge dashboard-badge-warning">
+                                    Estoque baixo
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% else %}
+
+        <div class="dashboard-empty">
+            ✓ Nenhum produto está abaixo do estoque mínimo.
+        </div>
+
+    {% endif %}
+
+</div>
+
+
+<div class="dashboard-panel">
+
+    <div class="dashboard-panel-title">
+        Últimas movimentações
+    </div>
+
+    <div class="dashboard-panel-description">
+        As 10 movimentações mais recentes do estoque
+    </div>
+
+    {% if ultimas_movimentacoes %}
+
+        <table class="dashboard-table">
+
+            <thead>
+                <tr>
+                    <th>Data</th>
+                    <th>Produto</th>
+                    <th>Tipo</th>
+                    <th>Quantidade</th>
+                    <th>Destino</th>
+                    <th>Usuário</th>
+                </tr>
+            </thead>
+
+            <tbody>
+
+                {% for movimentacao in ultimas_movimentacoes %}
+
+                    <tr>
+
+                        <td>
+                            {{ movimentacao.criado_em|date:"d/m/Y H:i" }}
+                        </td>
+
+                        <td>
+                            {{ movimentacao.produto.nome }}
+                        </td>
+
+                        <td>
+
+                            {% if movimentacao.tipo == "E" %}
+
+                                <span class="dashboard-badge dashboard-badge-success">
+                                    Entrada
+                                </span>
+
+                            {% elif movimentacao.tipo == "S" %}
+
+                                <span class="dashboard-badge dashboard-badge-danger">
+                                    Saída
+                                </span>
+
+                            {% else %}
+
+                                <span class="dashboard-badge dashboard-badge-warning">
+                                    Ajuste
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            <strong>
+                                {{ movimentacao.quantidade }}
+                            </strong>
+                        </td>
+
+                        <td>
+
+                            {% if movimentacao.destino %}
+                                {{ movimentacao.destino.nome }}
+                            {% else %}
+                                —
+                            {% endif %}
+
+                        </td>
+
+                        <td>
+                            {{ movimentacao.usuario.username }}
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    {% else %}
+
+        <div class="dashboard-empty">
+            Nenhuma movimentação registrada ainda.
+        </div>
+
+    {% endif %}
+
+</div>
+
+
 {{ meses|json_script:"dados-meses" }}
+
 {{ estoque_categoria_lista|json_script:"dados-categorias" }}
 
-{% endblock %}
-
-
-{% block extra_js %}
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
 
-    /*
-     * GRÁFICO DE ENTRADAS E SAÍDAS
-     */
+document.addEventListener("DOMContentLoaded", function () {
 
-    const dadosMeses = JSON.parse(
-        document.getElementById("dados-meses").textContent
-    );
+    const elementoMeses =
+        document.getElementById("dados-meses");
 
+    const elementoCategorias =
+        document.getElementById("dados-categorias");
 
-    const labelsMeses = dadosMeses.map(
-        item => item.nome
-    );
+    if (!elementoMeses || !elementoCategorias) {
+        return;
+    }
 
+    const dadosMeses =
+        JSON.parse(elementoMeses.textContent);
 
-    const entradas = dadosMeses.map(
-        item => item.entradas
-    );
-
-
-    const saidas = dadosMeses.map(
-        item => item.saidas
-    );
+    const dadosCategorias =
+        JSON.parse(elementoCategorias.textContent);
 
 
-    const ctxMovimentacoes = document
-        .getElementById("movimentacoesChart");
+    const elementoMovimentacoes =
+        document.getElementById("movimentacoesChart");
 
+    if (elementoMovimentacoes) {
 
-    new Chart(
-        ctxMovimentacoes,
-        {
-            type: "bar",
+        new Chart(
+            elementoMovimentacoes,
+            {
+                type: "bar",
 
-            data: {
+                data: {
+                    labels: dadosMeses.map(function (item) {
+                        return item.label;
+                    }),
 
-                labels: labelsMeses,
+                    datasets: [
+                        {
+                            label: "Entradas",
 
-                datasets: [
+                            data: dadosMeses.map(function (item) {
+                                return item.entradas;
+                            }),
 
-                    {
-                        label: "Entradas",
-                        data: entradas,
-                        borderWidth: 1
+                            borderWidth: 1
+                        },
+
+                        {
+                            label: "Saídas",
+
+                            data: dadosMeses.map(function (item) {
+                                return item.saidas;
+                            }),
+
+                            borderWidth: 1
+                        }
+                    ]
+                },
+
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+
+                    interaction: {
+                        mode: "index",
+                        intersect: false
                     },
 
-                    {
-                        label: "Saídas",
-                        data: saidas,
-                        borderWidth: 1
-                    }
+                    scales: {
+                        y: {
+                            beginAtZero: true,
 
-                ]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                interaction: {
-                    mode: "index",
-                    intersect: false
-                },
-
-                scales: {
-
-                    y: {
-
-                        beginAtZero: true,
-
-                        ticks: {
-                            precision: 0
+                            ticks: {
+                                precision: 0
+                            }
                         }
+                    },
 
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        }
                     }
+                }
+            }
+        );
 
+    }
+
+
+    const elementoCategoriasChart =
+        document.getElementById("categoriasChart");
+
+    if (
+        elementoCategoriasChart &&
+        dadosCategorias.length > 0
+    ) {
+
+        new Chart(
+            elementoCategoriasChart,
+            {
+                type: "doughnut",
+
+                data: {
+                    labels: dadosCategorias.map(function (item) {
+                        return item.categoria;
+                    }),
+
+                    datasets: [
+                        {
+                            label: "Estoque",
+
+                            data: dadosCategorias.map(function (item) {
+                                return item.quantidade;
+                            }),
+
+                            borderWidth: 1
+                        }
+                    ]
                 },
 
-                plugins: {
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
 
-                    legend: {
-                        position: "bottom"
+                    plugins: {
+                        legend: {
+                            position: "bottom"
+                        }
                     }
-
                 }
-
             }
+        );
 
-        }
-    );
+    }
 
-
-    /*
-     * GRÁFICO DE ESTOQUE POR CATEGORIA
-     */
-
-    const dadosCategorias = JSON.parse(
-        document.getElementById("dados-categorias").textContent
-    );
-
-
-    const labelsCategorias = dadosCategorias.map(
-        item => item.categoria
-    );
-
-
-    const valoresCategorias = dadosCategorias.map(
-        item => item.quantidade
-    );
-
-
-    const ctxCategorias = document
-        .getElementById("categoriasChart");
-
-
-    new Chart(
-        ctxCategorias,
-        {
-            type: "doughnut",
-
-            data: {
-
-                labels: labelsCategorias,
-
-                datasets: [
-
-                    {
-                        label: "Estoque",
-                        data: valoresCategorias,
-                        borderWidth: 1
-                    }
-
-                ]
-
-            },
-
-            options: {
-
-                responsive: true,
-
-                maintainAspectRatio: false,
-
-                plugins: {
-
-                    legend: {
-                        position: "bottom"
-                    }
-
-                }
-
-            }
-
-        }
-    );
+});
 
 </script>
 
 {% endblock %}
+'@ | Set-Content -Encoding UTF8 .\templates\estoque\dashboard.html

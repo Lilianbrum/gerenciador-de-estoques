@@ -1,4 +1,4 @@
-from django.core.exceptions import ValidationError
+﻿from django.core.exceptions import ValidationError
 from django.db import transaction
 
 from .models import (
@@ -24,33 +24,9 @@ def registrar_entrada(
     condicao="",
     origem="",
     documento_origem="",
+    ativo=True,
     observacao="",
 ):
-    """
-    Registra uma entrada de estoque.
-
-    A entrada atualiza:
-        1. ConfiguracaoEstoque
-        2. Produto.estoque_atual
-        3. Movimentacao
-
-    Tudo ocorre dentro de uma única transação.
-
-    A configuração é identificada pela combinação das
-    características informadas. Isso permite que o sistema
-    diferencie, por exemplo:
-
-        Mesa - Madeira - Marrom - 1,20 m x 0,60 m
-
-    de:
-
-        Mesa - Madeira - Branca - 1,80 m x 0,80 m
-
-    e também:
-
-        iPad - Apple - A2602 - 64 GB - 4 GB RAM
-    """
-
     if quantidade <= 0:
         raise ValidationError(
             "A quantidade deve ser maior que zero."
@@ -79,7 +55,7 @@ def registrar_entrada(
             defaults={
                 "quantidade": 0,
                 "observacao": observacao,
-                "ativo": True,
+                "ativo": ativo,
             },
         )
     )
@@ -89,7 +65,7 @@ def registrar_entrada(
     if observacao:
         configuracao.observacao = observacao
 
-    configuracao.ativo = True
+    configuracao.ativo = ativo
 
     configuracao.save()
 
@@ -123,17 +99,6 @@ def registrar_saida(
     configuracao=None,
     observacao="",
 ):
-    """
-    Registra uma saída de estoque.
-
-    Para novas saídas, a configuração é obrigatória.
-
-    A saída atualiza:
-        1. ConfiguracaoEstoque
-        2. Produto.estoque_atual
-        3. Movimentacao
-    """
-
     if quantidade <= 0:
         raise ValidationError(
             "A quantidade deve ser maior que zero."
@@ -180,13 +145,9 @@ def registrar_saida(
 
     configuracao.quantidade -= quantidade
 
-    if configuracao.quantidade == 0:
-        configuracao.ativo = True
-
     configuracao.save(
         update_fields=[
             "quantidade",
-            "ativo",
             "atualizado_em",
         ]
     )
@@ -214,23 +175,103 @@ def registrar_saida(
 
 
 @transaction.atomic
+def ajustar_estoque(
+    configuracao,
+    nova_quantidade,
+    usuario,
+    observacao="",
+):
+    """
+    Ajusta diretamente a quantidade de uma configuração,
+    atualiza o estoque total do produto e registra uma
+    movimentação do tipo A (ajuste).
+    """
+
+    if nova_quantidade < 0:
+        raise ValidationError(
+            "A nova quantidade não pode ser negativa."
+        )
+
+    configuracao = (
+        ConfiguracaoEstoque.objects
+        .select_for_update()
+        .select_related("produto")
+        .get(pk=configuracao.pk)
+    )
+
+    produto = (
+        Produto.objects
+        .select_for_update()
+        .get(pk=configuracao.produto_id)
+    )
+
+    quantidade_anterior = configuracao.quantidade
+
+    if nova_quantidade == quantidade_anterior:
+        raise ValidationError(
+            "A nova quantidade é igual à quantidade atual. "
+            "Nenhum ajuste é necessário."
+        )
+
+    diferenca = (
+        nova_quantidade - quantidade_anterior
+    )
+
+    novo_estoque_produto = (
+        produto.estoque_atual + diferenca
+    )
+
+    if novo_estoque_produto < 0:
+        raise ValidationError(
+            "O ajuste desta configuração faria o estoque "
+            "total do produto ficar negativo."
+        )
+
+    configuracao.quantidade = nova_quantidade
+
+    configuracao.save(
+        update_fields=[
+            "quantidade",
+            "atualizado_em",
+        ]
+    )
+
+    produto.estoque_atual = novo_estoque_produto
+
+    produto.save(
+        update_fields=[
+            "estoque_atual",
+            "atualizado_em",
+        ]
+    )
+
+    observacao_final = (
+        f"Ajuste de estoque: "
+        f"{quantidade_anterior} -> {nova_quantidade}."
+    )
+
+    if observacao:
+        observacao_final += (
+            f" Motivo: {observacao.strip()}"
+        )
+
+    movimentacao = Movimentacao.objects.create(
+        produto=produto,
+        configuracao=configuracao,
+        tipo="A",
+        quantidade=abs(diferenca),
+        usuario=usuario,
+        observacao=observacao_final,
+    )
+
+    return movimentacao
+
+
+@transaction.atomic
 def reverter_movimentacao(
     movimentacao_id,
     usuario,
 ):
-    """
-    Reverte uma movimentação existente e depois a exclui.
-
-    Entrada:
-        devolve o estoque ao estado anterior.
-
-    Saída:
-        devolve os itens ao estoque.
-
-    A operação é atômica para evitar que o histórico
-    seja apagado sem a reversão correspondente.
-    """
-
     movimentacao = (
         Movimentacao.objects
         .select_for_update()
@@ -265,10 +306,6 @@ def reverter_movimentacao(
         raise ValidationError(
             "A movimentação possui uma quantidade inválida."
         )
-
-    # ========================================================
-    # REVERSÃO DE ENTRADA
-    # ========================================================
 
     if movimentacao.tipo == "E":
 
@@ -306,10 +343,6 @@ def reverter_movimentacao(
             ]
         )
 
-    # ========================================================
-    # REVERSÃO DE SAÍDA
-    # ========================================================
-
     elif movimentacao.tipo == "S":
 
         produto.estoque_atual += quantidade
@@ -324,7 +357,6 @@ def reverter_movimentacao(
         if configuracao is not None:
 
             configuracao.quantidade += quantidade
-
             configuracao.ativo = True
 
             configuracao.save(
@@ -334,10 +366,6 @@ def reverter_movimentacao(
                     "atualizado_em",
                 ]
             )
-
-    # ========================================================
-    # AJUSTE
-    # ========================================================
 
     elif movimentacao.tipo == "A":
 

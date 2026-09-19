@@ -1,249 +1,255 @@
+{% load static %}
+
 <!DOCTYPE html>
 <html lang="pt-br">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>{% block title %}Gerenciador de Estoques{% endblock %}</title>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>
+        {% block title %}Gerenciador de Estoques{% endblock %}
+    </title>
 
     <style>
+
         * {
             box-sizing: border-box;
         }
 
+        html,
         body {
             margin: 0;
-            font-family: Arial, Helvetica, sans-serif;
-            background: #f4f6f9;
+            padding: 0;
+            min-height: 100%;
+        }
+
+        body {
+            font-family:
+                Arial,
+                Helvetica,
+                sans-serif;
+
+            background: #f4f6f8;
             color: #1f2937;
         }
 
         a {
-            text-decoration: none;
             color: inherit;
+            text-decoration: none;
         }
 
-        .layout {
-            display: flex;
+        button,
+        input,
+        select,
+        textarea {
+            font: inherit;
+        }
+
+        .app {
             min-height: 100vh;
+            display: flex;
         }
 
-        /* MENU LATERAL */
+        /* SIDEBAR */
 
         .sidebar {
             width: 250px;
-            background: #172033;
-            color: white;
-            position: fixed;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            padding: 24px 16px;
-            overflow-y: auto;
+            min-width: 250px;
+            background: #1f2937;
+            color: #ffffff;
+            min-height: 100vh;
+            padding: 20px 14px;
         }
 
-        .logo {
-            font-size: 22px;
-            font-weight: bold;
-            padding: 0 12px 25px;
-            border-bottom: 1px solid rgba(255,255,255,0.12);
-            margin-bottom: 20px;
+        .sidebar-brand {
+            padding: 8px 12px 24px;
         }
 
-        .logo small {
-            display: block;
+        .sidebar-brand h1 {
+            margin: 0;
+            font-size: 20px;
+            line-height: 1.3;
+        }
+
+        .sidebar-brand p {
+            margin: 6px 0 0;
             font-size: 12px;
-            font-weight: normal;
-            color: #aeb8ca;
-            margin-top: 5px;
+            color: #cbd5e1;
         }
 
-        .menu-title {
-            font-size: 11px;
-            text-transform: uppercase;
-            color: #7f8ba3;
-            padding: 10px 12px;
-            letter-spacing: 1px;
+        .menu {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
         }
 
         .menu a {
             display: block;
-            padding: 12px;
-            margin: 4px 0;
-            border-radius: 8px;
-            color: #dbe2ee;
-            transition: 0.2s;
+            padding: 11px 12px;
+            border-radius: 7px;
+            color: #e5e7eb;
+            font-size: 14px;
         }
 
         .menu a:hover {
-            background: #26334d;
-            color: white;
+            background: #374151;
+            color: #ffffff;
         }
 
-        .menu a.active {
-            background: #2563eb;
-            color: white;
+        .menu-section {
+            margin-top: 18px;
+            margin-bottom: 6px;
+            padding: 0 12px;
+            color: #9ca3af;
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
         }
 
-        /* BOTÃO SAIR */
-
-        .logout-form {
-            margin: 0;
-        }
-
-        .logout-button {
-            display: block;
-            width: 100%;
-            padding: 12px;
-            margin: 4px 0;
-            border: none;
-            border-radius: 8px;
-            background: transparent;
-            color: #dbe2ee;
-            font-family: inherit;
-            font-size: 14px;
-            text-align: left;
-            cursor: pointer;
-            transition: 0.2s;
-        }
-
-        .logout-button:hover {
-            background: #26334d;
-            color: white;
-        }
-
-        /* CONTEÚDO */
+        /* ÁREA PRINCIPAL */
 
         .main {
-            margin-left: 250px;
-            width: calc(100% - 250px);
-            min-height: 100vh;
+            flex: 1;
+            min-width: 0;
+            display: flex;
+            flex-direction: column;
         }
 
         .topbar {
-            height: 70px;
-            background: white;
+            min-height: 64px;
+            background: #ffffff;
             border-bottom: 1px solid #e5e7eb;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 30px;
+            padding: 0 28px;
         }
 
         .topbar-title {
             font-size: 18px;
             font-weight: bold;
+            color: #111827;
         }
 
-        .user-area {
-            color: #64748b;
-            font-size: 14px;
+        .topbar-user {
+            font-size: 13px;
+            color: #6b7280;
         }
 
         .content {
-            padding: 30px;
+            padding: 28px;
+            width: 100%;
         }
 
-        /* TÍTULOS */
+        /* CABEÇALHO DA PÁGINA */
 
         .page-header {
             display: flex;
             justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            gap: 15px;
+            align-items: flex-start;
+            gap: 20px;
+            margin-bottom: 24px;
         }
 
         .page-header h1 {
-            margin: 0;
+            margin: 0 0 7px;
             font-size: 28px;
             color: #111827;
         }
 
         .page-header p {
-            margin: 6px 0 0;
-            color: #64748b;
+            margin: 0;
+            color: #6b7280;
+        }
+
+        /* PAINÉIS */
+
+        .panel {
+            background: #ffffff;
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 22px;
+            margin-bottom: 22px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+        }
+
+        .panel-header {
+            margin-bottom: 20px;
+        }
+
+        .panel-header h2 {
+            margin: 0 0 6px;
+            font-size: 19px;
+            color: #111827;
+        }
+
+        .panel-header p {
+            margin: 0;
+            color: #6b7280;
+            font-size: 14px;
         }
 
         /* BOTÕES */
 
         .btn {
-            display: inline-block;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 16px;
-            font-size: 14px;
-            font-weight: bold;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 40px;
+            padding: 9px 15px;
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            background: #ffffff;
+            color: #374151;
             cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .btn:hover {
+            background: #f9fafb;
         }
 
         .btn-primary {
             background: #2563eb;
-            color: white;
+            border-color: #2563eb;
+            color: #ffffff;
         }
 
         .btn-primary:hover {
             background: #1d4ed8;
-        }
-
-        .btn-success {
-            background: #16a34a;
-            color: white;
+            border-color: #1d4ed8;
         }
 
         .btn-danger {
             background: #dc2626;
-            color: white;
+            border-color: #dc2626;
+            color: #ffffff;
         }
 
-        .btn-secondary {
-            background: #64748b;
-            color: white;
-        }
-
-        /* CARDS */
-
-        .cards {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 20px;
-            margin-bottom: 25px;
-        }
-
-        .card {
-            background: white;
-            border-radius: 12px;
-            padding: 22px;
-            border: 1px solid #e5e7eb;
-        }
-
-        .card-title {
-            color: #64748b;
-            font-size: 13px;
-            margin-bottom: 8px;
-        }
-
-        .card-value {
-            font-size: 28px;
-            font-weight: bold;
-            color: #111827;
-        }
-
-        .card-description {
-            margin-top: 5px;
-            color: #64748b;
-            font-size: 12px;
+        .btn-danger:hover {
+            background: #b91c1c;
+            border-color: #b91c1c;
         }
 
         /* FORMULÁRIOS */
 
-        .form-card {
-            background: white;
-            border-radius: 12px;
-            padding: 25px;
-            border: 1px solid #e5e7eb;
-            max-width: 900px;
+        .form-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(260px, 1fr)
+                );
+
+            gap: 18px;
         }
 
         .form-group {
@@ -253,46 +259,142 @@
         .form-group label {
             display: block;
             margin-bottom: 7px;
-            font-weight: bold;
+            font-weight: 600;
             font-size: 14px;
             color: #374151;
         }
 
-        input,
-        select,
-        textarea {
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
             width: 100%;
-            padding: 11px 12px;
-            border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            font-family: inherit;
-            font-size: 14px;
-            background: white;
-        }
-
-        input:focus,
-        select:focus,
-        textarea:focus {
+            border: 1px solid #d1d5db;
+            border-radius: 7px;
+            background: #ffffff;
+            color: #111827;
+            padding: 10px 11px;
             outline: none;
-            border-color: #2563eb;
         }
 
-        textarea {
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #2563eb;
+            box-shadow:
+                0 0 0 3px
+                rgba(37, 99, 235, 0.10);
+        }
+
+        .form-group textarea {
+            min-height: 90px;
             resize: vertical;
         }
 
-        .action-buttons {
+        .form-group select {
+            min-height: 42px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
             display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .checkbox-group input {
+            width: auto;
+        }
+
+        .field-error {
+            margin-top: 6px;
+            color: #b91c1c;
+            font-size: 13px;
+        }
+
+        .form-actions {
+            display: flex;
+            flex-wrap: wrap;
             gap: 10px;
-            margin-top: 20px;
+            margin-top: 22px;
+            padding-top: 18px;
+            border-top: 1px solid #e5e7eb;
+        }
+
+        /* MENSAGENS */
+
+        .messages {
+            margin-bottom: 20px;
+        }
+
+        .message {
+            padding: 12px 14px;
+            border-radius: 7px;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .message-success {
+            background: #ecfdf5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        .message-error {
+            background: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+        }
+
+        .message-warning {
+            background: #fffbeb;
+            border: 1px solid #fde68a;
+            color: #92400e;
+        }
+
+        .message-info {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            color: #1e40af;
+        }
+
+        /* INFORMAÇÕES */
+
+        .info-grid {
+            display: grid;
+            grid-template-columns:
+                repeat(
+                    auto-fit,
+                    minmax(220px, 1fr)
+                );
+
+            gap: 16px;
+        }
+
+        .info-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            background: #f9fafb;
+        }
+
+        .info-item strong {
+            display: block;
+            margin-bottom: 7px;
+            color: #111827;
+        }
+
+        .info-item span {
+            display: block;
+            color: #6b7280;
+            font-size: 13px;
+            line-height: 1.5;
         }
 
         /* TABELAS */
 
-        .table-card {
-            background: white;
-            border-radius: 12px;
-            border: 1px solid #e5e7eb;
+        .table-container {
+            width: 100%;
             overflow-x: auto;
         }
 
@@ -301,116 +403,120 @@
             border-collapse: collapse;
         }
 
-        th {
-            background: #f8fafc;
-            color: #475569;
-            font-size: 12px;
-            text-transform: uppercase;
-            text-align: left;
-            padding: 14px;
-            border-bottom: 1px solid #e5e7eb;
-        }
-
+        th,
         td {
-            padding: 14px;
-            border-bottom: 1px solid #eef2f7;
+            padding: 11px 12px;
+            border-bottom: 1px solid #e5e7eb;
+            text-align: left;
+            vertical-align: middle;
             font-size: 14px;
         }
 
-        tr:last-child td {
-            border-bottom: none;
+        th {
+            background: #f9fafb;
+            color: #374151;
+            font-weight: 700;
         }
 
-        /* GRID DE CONTEÚDO */
-
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 20px;
-        }
-
-        /* ESTADOS */
-
-        .empty-state {
-            text-align: center;
-            padding: 50px 20px;
-            color: #64748b;
-        }
-
-        .alert {
-            padding: 14px 16px;
-            border-radius: 8px;
-            margin-bottom: 20px;
-        }
-
-        .alert-success {
-            background: #dcfce7;
-            color: #166534;
-        }
-
-        .alert-error {
-            background: #fee2e2;
-            color: #991b1b;
-        }
-
-        .alert-warning {
-            background: #fef3c7;
-            color: #92400e;
+        tr:hover td {
+            background: #fafafa;
         }
 
         /* RESPONSIVO */
 
-        @media (max-width: 1000px) {
-            .cards {
-                grid-template-columns: repeat(2, 1fr);
+        @media (max-width: 900px) {
+
+            .app {
+                flex-direction: column;
             }
 
-            .content-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-
-        @media (max-width: 700px) {
             .sidebar {
-                width: 210px;
+                width: 100%;
+                min-width: 0;
+                min-height: auto;
+            }
+
+            .menu {
+                display: grid;
+                grid-template-columns:
+                    repeat(
+                        auto-fit,
+                        minmax(150px, 1fr)
+                    );
+            }
+
+            .menu-section {
+                grid-column: 1 / -1;
             }
 
             .main {
-                margin-left: 210px;
-                width: calc(100% - 210px);
-            }
-
-            .cards {
-                grid-template-columns: 1fr;
-            }
-
-            .topbar {
-                padding: 0 15px;
+                width: 100%;
             }
 
             .content {
-                padding: 15px;
+                padding: 20px;
             }
+
+            .topbar {
+                padding: 0 20px;
+            }
+
         }
+
+        @media (max-width: 600px) {
+
+            .page-header {
+                flex-direction: column;
+            }
+
+            .page-header h1 {
+                font-size: 23px;
+            }
+
+            .content {
+                padding: 14px;
+            }
+
+            .panel {
+                padding: 16px;
+            }
+
+            .topbar {
+                padding: 0 14px;
+            }
+
+            .topbar-user {
+                display: none;
+            }
+
+        }
+
     </style>
 
-    {% block extra_css %}{% endblock %}
 </head>
+
 
 <body>
 
-<div class="layout">
+<div class="app">
+
 
     <aside class="sidebar">
 
-        <div class="logo">
-            Gerenciador de Estoques
-            <small>Controle e distribuição</small>
+        <div class="sidebar-brand">
+
+            <h1>Gerenciador de Estoques</h1>
+
+            <p>
+                Controle e distribuição de materiais
+            </p>
+
         </div>
 
-        <div class="menu">
 
-            <div class="menu-title">
+        <nav class="menu">
+
+            <div class="menu-section">
                 Principal
             </div>
 
@@ -418,16 +524,13 @@
                 Dashboard
             </a>
 
-            <a href="{% url 'produtos' %}">
-                Produtos
-            </a>
-
-            <a href="{% url 'novo_produto' %}">
-                Novo produto
-            </a>
-
-            <div class="menu-title">
+            <a href="{% url 'estoque' %}">
                 Estoque
+            </a>
+
+
+            <div class="menu-section">
+                Movimentações
             </div>
 
             <a href="{% url 'entrada_estoque' %}">
@@ -442,7 +545,29 @@
                 Histórico
             </a>
 
-            <div class="menu-title">
+
+            <div class="menu-section">
+                Cadastros
+            </div>
+
+            <a href="{% url 'produtos' %}">
+                Produtos
+            </a>
+
+            <a href="{% url 'novo_produto' %}">
+                Novo produto
+            </a>
+
+            <a href="{% url 'categorias' %}">
+                Categorias
+            </a>
+
+            <a href="{% url 'destinos' %}">
+                Destinos
+            </a>
+
+
+            <div class="menu-section">
                 Distribuição
             </div>
 
@@ -450,63 +575,84 @@
                 Distribuições
             </a>
 
-            <a href="{% url 'destinos' %}">
-                Destinos
-            </a>
-
-            <div class="menu-title">
-                Sistema
-            </div>
-
-            <form method="post" action="{% url 'logout' %}" class="logout-form">
-                {% csrf_token %}
-                <button type="submit" class="logout-button">
-                    Sair
-                </button>
-            </form>
-
-        </div>
+        </nav>
 
     </aside>
 
+
     <main class="main">
+
 
         <header class="topbar">
 
             <div class="topbar-title">
+
                 {% block topbar_title %}
-                    Gerenciador de Estoques
+                Gerenciador de Estoques
                 {% endblock %}
+
             </div>
 
-            <div class="user-area">
-                {% if user.is_authenticated %}
-                    Usuário: {{ user.username }}
+
+            <div class="topbar-user">
+
+                {% if request.user.is_authenticated %}
+
+                    Usuário:
+                    {{ request.user.get_username }}
+
                 {% endif %}
+
             </div>
 
         </header>
 
+
         <section class="content">
 
+
             {% if messages %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ message.tags }}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
+
+                <div class="messages">
+
+                    {% for message in messages %}
+
+                        <div
+                            class="
+                                message
+                                {% if message.tags == 'success' %}
+                                    message-success
+                                {% elif message.tags == 'error' %}
+                                    message-error
+                                {% elif message.tags == 'warning' %}
+                                    message-warning
+                                {% else %}
+                                    message-info
+                                {% endif %}
+                            "
+                        >
+                            {{ message }}
+                        </div>
+
+                    {% endfor %}
+
+                </div>
+
             {% endif %}
+
 
             {% block content %}
             {% endblock %}
 
+
         </section>
+
 
     </main>
 
+
 </div>
 
-{% block extra_js %}{% endblock %}
-
 </body>
+
 </html>

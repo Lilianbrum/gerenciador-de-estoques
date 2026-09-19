@@ -13,17 +13,14 @@ Histórico de Movimentações
 <div class="page-header">
 
     <div>
-
         <h1>Histórico de Movimentações</h1>
 
         <p>
             Consulte todas as entradas, saídas e ajustes realizados no estoque.
         </p>
-
     </div>
 
     <div>
-
         <a
             href="{% url 'entrada_estoque' %}"
             class="btn btn-primary"
@@ -37,7 +34,6 @@ Histórico de Movimentações
         >
             − Saída / Distribuição
         </a>
-
     </div>
 
 </div>
@@ -48,14 +44,12 @@ Histórico de Movimentações
     <div class="panel-header">
 
         <div>
-
             <h2>Filtros</h2>
 
             <p>
                 Pesquise por produto, código, destino,
                 usuário, configuração ou observação.
             </p>
-
         </div>
 
     </div>
@@ -71,7 +65,6 @@ Histórico de Movimentações
                 value="{{ termo }}"
                 placeholder="Pesquisar movimentação..."
             >
-
 
             <select name="tipo">
 
@@ -102,14 +95,12 @@ Histórico de Movimentações
 
             </select>
 
-
             <button
                 type="submit"
                 class="btn btn-primary"
             >
                 Filtrar
             </button>
-
 
             <a
                 href="{% url 'historico_movimentacoes' %}"
@@ -130,7 +121,6 @@ Histórico de Movimentações
     <div class="panel-header">
 
         <div>
-
             <h2>Movimentações</h2>
 
             <p>
@@ -138,7 +128,6 @@ Histórico de Movimentações
                 registro{{ movimentacoes|length|pluralize }}
                 encontrado{{ movimentacoes|length|pluralize }}.
             </p>
-
         </div>
 
     </div>
@@ -155,21 +144,13 @@ Histórico de Movimentações
                     <tr>
 
                         <th>Data</th>
-
                         <th>Produto</th>
-
                         <th>Código</th>
-
                         <th>Configuração</th>
-
                         <th>Tipo</th>
-
                         <th>Quantidade</th>
-
                         <th>Destino</th>
-
                         <th>Usuário</th>
-
                         <th>Observação</th>
 
                         {% if request.user.is_staff %}
@@ -193,24 +174,18 @@ Histórico de Movimentações
 
 
                             <td>
-
                                 <strong>
                                     {{ movimentacao.produto.nome }}
                                 </strong>
-
                             </td>
 
 
                             <td>
 
                                 {% if movimentacao.produto.codigo %}
-
                                     {{ movimentacao.produto.codigo }}
-
                                 {% else %}
-
                                     —
-
                                 {% endif %}
 
                             </td>
@@ -221,6 +196,7 @@ Histórico de Movimentações
                                 {% if movimentacao.configuracao %}
 
                                     <strong>
+
                                         {% if movimentacao.configuracao.capacidade %}
                                             {{ movimentacao.configuracao.capacidade }}
                                         {% endif %}
@@ -228,6 +204,7 @@ Histórico de Movimentações
                                         {% if movimentacao.configuracao.memoria_ram %}
                                             / {{ movimentacao.configuracao.memoria_ram }} RAM
                                         {% endif %}
+
                                     </strong>
 
                                     {% if movimentacao.configuracao.condicao %}
@@ -241,7 +218,6 @@ Histórico de Movimentações
 
                                     <span title="Movimentação antiga sem configuração registrada">
                                         —
-
                                     </span>
 
                                 {% endif %}
@@ -302,13 +278,9 @@ Histórico de Movimentações
                             <td>
 
                                 {% if movimentacao.destino %}
-
                                     {{ movimentacao.destino.nome }}
-
                                 {% else %}
-
                                     —
-
                                 {% endif %}
 
                             </td>
@@ -322,13 +294,9 @@ Histórico de Movimentações
                             <td>
 
                                 {% if movimentacao.observacao %}
-
                                     {{ movimentacao.observacao }}
-
                                 {% else %}
-
                                     —
-
                                 {% endif %}
 
                             </td>
@@ -344,7 +312,7 @@ Histórico de Movimentações
                                             method="post"
                                             action="{% url 'excluir_movimentacao' movimentacao.id %}"
                                             style="display: inline;"
-                                            onsubmit="return confirm('ATENÇÃO: esta ação irá remover a movimentação e reverter o estoque correspondente. Deseja continuar?');"
+                                            onsubmit="return confirm('ATENÇÃO: esta ação irá excluir a movimentação e reverter o estoque correspondente. Deseja continuar?');"
                                         >
 
                                             {% csrf_token %}

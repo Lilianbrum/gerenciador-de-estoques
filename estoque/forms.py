@@ -10,9 +10,16 @@ from .models import (
 
 class EntradaEstoqueForm(forms.Form):
 
+    categoria = forms.ModelChoiceField(
+        queryset=Categoria.objects.none(),
+        label="Categoria",
+        empty_label="Selecione a categoria",
+    )
+
     produto = forms.ModelChoiceField(
-        queryset=Produto.objects.filter(ativo=True),
-        label="Produto"
+        queryset=Produto.objects.none(),
+        label="Produto",
+        empty_label="Selecione o produto",
     )
 
     descricao = forms.CharField(
@@ -169,20 +176,84 @@ class EntradaEstoqueForm(forms.Form):
         )
     )
 
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.fields["categoria"].queryset = (
+            Categoria.objects
+            .order_by("nome")
+        )
+
+        self.fields["produto"].queryset = (
+            Produto.objects
+            .filter(ativo=True)
+            .select_related("categoria")
+            .order_by("nome")
+        )
+
+        if self.is_bound:
+
+            categoria_id = self.data.get("categoria")
+
+            if categoria_id:
+
+                self.fields["produto"].queryset = (
+                    Produto.objects
+                    .filter(
+                        ativo=True,
+                        categoria_id=categoria_id,
+                    )
+                    .select_related("categoria")
+                    .order_by("nome")
+                )
+
+        else:
+
+            categoria_id = self.initial.get("categoria")
+
+            if categoria_id:
+
+                self.fields["produto"].queryset = (
+                    Produto.objects
+                    .filter(
+                        ativo=True,
+                        categoria_id=categoria_id,
+                    )
+                    .select_related("categoria")
+                    .order_by("nome")
+                )
+
+    def clean(self):
+
+        cleaned_data = super().clean()
+
+        categoria = cleaned_data.get("categoria")
+        produto = cleaned_data.get("produto")
+
+        if (
+            categoria is not None
+            and produto is not None
+            and produto.categoria_id != categoria.id
+        ):
+            self.add_error(
+                "produto",
+                "O produto selecionado não pertence "
+                "à categoria escolhida."
+            )
+
+        return cleaned_data
+
 
 class SaidaEstoqueForm(forms.Form):
 
     produto = forms.ModelChoiceField(
-        queryset=Produto.objects.filter(ativo=True),
+        queryset=Produto.objects.none(),
         label="Produto"
     )
 
     configuracao = forms.ModelChoiceField(
-        queryset=ConfiguracaoEstoque.objects.filter(
-            ativo=True
-        ).select_related(
-            "produto"
-        ),
+        queryset=ConfiguracaoEstoque.objects.none(),
         label="Configuração",
         empty_label="Selecione a configuração"
     )
@@ -198,7 +269,7 @@ class SaidaEstoqueForm(forms.Form):
     )
 
     destino = forms.ModelChoiceField(
-        queryset=Destino.objects.filter(ativo=True),
+        queryset=Destino.objects.none(),
         label="Destino"
     )
 
@@ -212,17 +283,42 @@ class SaidaEstoqueForm(forms.Form):
         )
     )
 
+    def __init__(self, *args, **kwargs):
+
+        super().__init__(*args, **kwargs)
+
+        self.fields["produto"].queryset = (
+            Produto.objects
+            .filter(ativo=True)
+            .order_by("nome")
+        )
+
+        self.fields["configuracao"].queryset = (
+            ConfiguracaoEstoque.objects
+            .filter(ativo=True)
+            .select_related("produto")
+            .order_by(
+                "produto__nome",
+                "marca",
+                "modelo",
+                "capacidade",
+                "memoria_ram",
+                "condicao",
+            )
+        )
+
+        self.fields["destino"].queryset = (
+            Destino.objects
+            .filter(ativo=True)
+            .order_by("nome")
+        )
+
     def clean(self):
 
         cleaned_data = super().clean()
 
-        produto = cleaned_data.get(
-            "produto"
-        )
-
-        configuracao = cleaned_data.get(
-            "configuracao"
-        )
+        produto = cleaned_data.get("produto")
+        configuracao = cleaned_data.get("configuracao")
 
         if (
             produto is not None
@@ -266,20 +362,14 @@ class ProdutoForm(forms.ModelForm):
         widgets = {
             "nome": forms.TextInput(
                 attrs={
-                    "placeholder": (
-                        "Nome base do produto"
-                    )
+                    "placeholder": "Nome base do produto"
                 }
             ),
-
             "codigo": forms.TextInput(
                 attrs={
-                    "placeholder": (
-                        "Código do produto, se houver"
-                    )
+                    "placeholder": "Código do produto, se houver"
                 }
             ),
-
             "tipo_produto": forms.TextInput(
                 attrs={
                     "placeholder": (
@@ -288,17 +378,12 @@ class ProdutoForm(forms.ModelForm):
                     )
                 }
             ),
-
             "categoria": forms.Select(),
-
             "unidade": forms.TextInput(
                 attrs={
-                    "placeholder": (
-                        "Ex.: UN, CX, KG, LT..."
-                    )
+                    "placeholder": "Ex.: UN, CX, KG, LT..."
                 }
             ),
-
             "estoque_minimo": forms.NumberInput(
                 attrs={
                     "min": 0
@@ -321,13 +406,11 @@ class ProdutoForm(forms.ModelForm):
         )
 
         if self.instance and self.instance.pk:
-
             consulta = consulta.exclude(
                 pk=self.instance.pk
             )
 
         if consulta.exists():
-
             raise forms.ValidationError(
                 "Já existe um produto cadastrado com este código. "
                 "Se for o mesmo produto com outra configuração, "
@@ -356,12 +439,9 @@ class CategoriaForm(forms.ModelForm):
         widgets = {
             "nome": forms.TextInput(
                 attrs={
-                    "placeholder": (
-                        "Nome da categoria"
-                    )
+                    "placeholder": "Nome da categoria"
                 }
             ),
-
             "descricao": forms.Textarea(
                 attrs={
                     "rows": 3,
@@ -386,7 +466,7 @@ class DestinoForm(forms.ModelForm):
         ]
 
         labels = {
-            "nome": "Nome do destino",
+            "nome": "Nome",
             "tipo": "Tipo",
             "descricao": "Descrição / Observações",
             "ativo": "Destino ativo",
@@ -401,7 +481,6 @@ class DestinoForm(forms.ModelForm):
                     )
                 }
             ),
-
             "tipo": forms.TextInput(
                 attrs={
                     "placeholder": (
@@ -410,7 +489,6 @@ class DestinoForm(forms.ModelForm):
                     )
                 }
             ),
-
             "descricao": forms.Textarea(
                 attrs={
                     "rows": 4,
@@ -420,3 +498,33 @@ class DestinoForm(forms.ModelForm):
                 }
             ),
         }
+
+
+class AjusteEstoqueForm(forms.Form):
+
+    nova_quantidade = forms.IntegerField(
+        label="Nova quantidade",
+        min_value=0,
+        widget=forms.NumberInput(
+            attrs={
+                "min": 0,
+                "placeholder": (
+                    "Informe a quantidade física encontrada"
+                ),
+            }
+        )
+    )
+
+    observacao = forms.CharField(
+        label="Motivo do ajuste",
+        required=True,
+        widget=forms.Textarea(
+            attrs={
+                "rows": 4,
+                "placeholder": (
+                    "Ex.: Conferência física do estoque, "
+                    "inventário, correção de quantidade..."
+                )
+            }
+        )
+    )

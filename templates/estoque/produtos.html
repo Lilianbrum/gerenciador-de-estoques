@@ -2,435 +2,91 @@
 
 {% block title %}Produtos{% endblock %}
 
-{% block extra_css %}
-<style>
-    .btn-primary {
-        background: #2563eb;
-        color: white;
-    }
-
-    .btn-primary:hover {
-        background: #1d4ed8;
-    }
-
-    .btn-edit {
-        background: #eef2ff;
-        color: #3730a3;
-    }
-
-    .btn-edit:hover {
-        background: #e0e7ff;
-    }
-
-    .filters {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        margin-bottom: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    }
-
-    .filters-title {
-        font-size: 17px;
-        font-weight: bold;
-        color: #111827;
-        margin-bottom: 18px;
-    }
-
-    .filter-grid {
-        display: grid;
-        grid-template-columns: 2fr 1fr 1fr 1fr auto;
-        gap: 15px;
-        align-items: end;
-    }
-
-    .form-group {
-        display: flex;
-        flex-direction: column;
-        gap: 7px;
-    }
-
-    .form-group label {
-        font-size: 13px;
-        font-weight: 600;
-        color: #374151;
-    }
-
-    .form-group input,
-    .form-group select {
-        width: 100%;
-        box-sizing: border-box;
-        padding: 11px 12px;
-        border: 1px solid #d1d5db;
-        border-radius: 8px;
-        background: white;
-        color: #111827;
-        font-size: 14px;
-    }
-
-    .form-group input:focus,
-    .form-group select:focus {
-        outline: none;
-        border-color: #2563eb;
-        box-shadow: 0 0 0 3px rgba(37,99,235,0.10);
-    }
-
-    .summary {
-        display: grid;
-        grid-template-columns: repeat(3, 1fr);
-        gap: 15px;
-        margin-bottom: 20px;
-    }
-
-    .summary-card {
-        background: white;
-        border-radius: 12px;
-        padding: 20px;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    }
-
-    .summary-label {
-        color: #6b7280;
-        font-size: 13px;
-        margin-bottom: 8px;
-    }
-
-    .summary-value {
-        color: #111827;
-        font-size: 28px;
-        font-weight: bold;
-    }
-
-    .table-card {
-        background: white;
-        border-radius: 12px;
-        overflow: hidden;
-        box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-    }
-
-    .table-header {
-        padding: 20px;
-        border-bottom: 1px solid #e5e7eb;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 15px;
-    }
-
-    .table-header h3 {
-        margin: 0;
-        font-size: 18px;
-    }
-
-    .table-header span {
-        color: #6b7280;
-        font-size: 14px;
-    }
-
-    .table-wrapper {
-        overflow-x: auto;
-    }
-
-    table {
-        width: 100%;
-        border-collapse: collapse;
-    }
-
-    th {
-        background: #f9fafb;
-        color: #4b5563;
-        font-size: 12px;
-        text-transform: uppercase;
-        letter-spacing: 0.03em;
-        text-align: left;
-        padding: 14px 16px;
-        border-bottom: 1px solid #e5e7eb;
-    }
-
-    td {
-        padding: 15px 16px;
-        border-bottom: 1px solid #f0f0f0;
-        font-size: 14px;
-        vertical-align: middle;
-    }
-
-    tr:hover td {
-        background: #f9fafb;
-    }
-
-    .product-name {
-        font-weight: bold;
-        color: #111827;
-    }
-
-    .product-description {
-        color: #6b7280;
-        font-size: 12px;
-        margin-top: 4px;
-        max-width: 300px;
-    }
-
-    .badge {
-        display: inline-block;
-        padding: 5px 9px;
-        border-radius: 20px;
-        font-size: 11px;
-        font-weight: bold;
-    }
-
-    .badge-new {
-        background: #dcfce7;
-        color: #166534;
-    }
-
-    .badge-used {
-        background: #fef3c7;
-        color: #92400e;
-    }
-
-    .badge-sealed {
-        background: #dbeafe;
-        color: #1e40af;
-    }
-
-    .badge-default {
-        background: #e5e7eb;
-        color: #374151;
-    }
-
-    .stock {
-        font-weight: bold;
-        font-size: 16px;
-        color: #111827;
-    }
-
-    .status-active {
-        color: #15803d;
-        font-weight: bold;
-    }
-
-    .status-inactive {
-        color: #dc2626;
-        font-weight: bold;
-    }
-
-    .empty {
-        text-align: center;
-        padding: 60px 20px;
-        color: #6b7280;
-    }
-
-    .empty-icon {
-        font-size: 45px;
-        margin-bottom: 10px;
-    }
-
-    .mobile-products {
-        display: none;
-    }
-
-    .mobile-product-card {
-        background: white;
-        border: 1px solid #e5e7eb;
-        border-radius: 12px;
-        padding: 16px;
-        margin: 12px;
-        box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-
-    .mobile-product-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        gap: 12px;
-        margin-bottom: 14px;
-    }
-
-    .mobile-product-name {
-        font-size: 17px;
-        font-weight: bold;
-        color: #111827;
-    }
-
-    .mobile-product-code {
-        color: #6b7280;
-        font-size: 12px;
-        margin-top: 4px;
-    }
-
-    .mobile-product-info {
-        display: grid;
-        grid-template-columns: 1fr 1fr;
-        gap: 12px;
-        margin-bottom: 15px;
-    }
-
-    .mobile-info-item {
-        background: #f9fafb;
-        border-radius: 8px;
-        padding: 10px;
-    }
-
-    .mobile-info-label {
-        color: #6b7280;
-        font-size: 11px;
-        margin-bottom: 4px;
-        text-transform: uppercase;
-        font-weight: bold;
-    }
-
-    .mobile-info-value {
-        font-size: 14px;
-        font-weight: 600;
-        color: #111827;
-    }
-
-    .mobile-product-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        gap: 10px;
-        padding-top: 12px;
-        border-top: 1px solid #e5e7eb;
-    }
-
-    .mobile-product-footer .btn-edit {
-        flex: 1;
-        text-align: center;
-    }
-
-    @media (max-width: 1100px) {
-        .filter-grid {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .summary {
-            grid-template-columns: repeat(2, 1fr);
-        }
-    }
-
-    @media (max-width: 700px) {
-        .page-header {
-            flex-direction: column;
-            align-items: stretch;
-        }
-
-        .page-header .btn {
-            width: 100%;
-            text-align: center;
-        }
-
-        .filter-grid {
-            grid-template-columns: 1fr;
-        }
-
-        .filter-grid .btn {
-            width: 100%;
-        }
-
-        .summary {
-            grid-template-columns: 1fr 1fr;
-        }
-
-        .table-card {
-            box-shadow: none;
-            background: transparent;
-        }
-
-        .table-header {
-            background: white;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            padding: 15px;
-        }
-
-        .table-wrapper {
-            display: none;
-        }
-
-        .mobile-products {
-            display: block;
-        }
-
-        .mobile-product-card {
-            margin-left: 0;
-            margin-right: 0;
-        }
-    }
-
-    @media (max-width: 430px) {
-        .summary {
-            grid-template-columns: 1fr;
-        }
-
-        .mobile-product-info {
-            grid-template-columns: 1fr;
-        }
-
-        .mobile-product-header {
-            flex-direction: column;
-        }
-    }
-</style>
+{% block topbar_title %}
+Produtos
 {% endblock %}
-
 
 {% block content %}
 
 <div class="page-header">
+
     <div>
-        <h2>Produtos</h2>
-        <p>Consulte e gerencie todos os produtos cadastrados.</p>
+        <h1>Produtos</h1>
+
+        <p>
+            Consulte, pesquise e gerencie os produtos cadastrados no estoque.
+        </p>
     </div>
 
-    <a href="{% url 'novo_produto' %}" class="btn btn-primary">
-        + Novo produto
-    </a>
+    <div>
+        <a
+            href="{% url 'novo_produto' %}"
+            class="btn btn-primary"
+        >
+            + Iniciar cadastro
+        </a>
+    </div>
+
 </div>
 
 
-<div class="filters">
+<div class="panel">
 
-    <div class="filters-title">
-        🔎 Filtros
+    <div class="panel-header">
+
+        <div>
+            <h2>Produtos cadastrados</h2>
+
+            <p>
+                Total de produtos:
+                <strong>{{ produtos|length }}</strong>
+            </p>
+        </div>
+
     </div>
+
 
     <form method="get">
 
-        <div class="filter-grid">
+        <div class="form-grid">
 
             <div class="form-group">
-                <label for="q">
+
+                <label for="id_q">
                     Pesquisar
                 </label>
 
                 <input
                     type="text"
-                    id="q"
+                    id="id_q"
                     name="q"
-                    value="{{ request.GET.q|default:'' }}"
-                    placeholder="Nome, código ou descrição..."
+                    value="{{ q|default:'' }}"
+                    placeholder="Nome, código ou descrição"
                 >
+
             </div>
 
 
             <div class="form-group">
 
-                <label for="categoria">
+                <label for="id_categoria">
                     Categoria
                 </label>
 
-                <select id="categoria" name="categoria">
+                <select
+                    id="id_categoria"
+                    name="categoria"
+                >
 
                     <option value="">
-                        Todas
+                        Todas as categorias
                     </option>
 
                     {% for categoria in categorias %}
 
                         <option
                             value="{{ categoria.id }}"
-                            {% if request.GET.categoria == categoria.id|stringformat:"s" %}
+                            {% if categoria_selecionada|stringformat:"s" == categoria.id|stringformat:"s" %}
                                 selected
                             {% endif %}
                         >
@@ -446,73 +102,87 @@
 
             <div class="form-group">
 
-                <label for="tipo">
-                    Tipo
+                <label for="id_tipo">
+                    Tipo do produto
                 </label>
 
-                <input
-                    type="text"
-                    id="tipo"
+                <select
+                    id="id_tipo"
                     name="tipo"
-                    value="{{ request.GET.tipo|default:'' }}"
-                    placeholder="Ex.: Smartphone"
                 >
 
-            </div>
-
-
-            <div class="form-group">
-
-                <label for="condicao">
-                    Condição
-                </label>
-
-                <select id="condicao" name="condicao">
-
                     <option value="">
-                        Todas
+                        Todos os tipos
                     </option>
 
-                    <option
-                        value="NOVO"
-                        {% if request.GET.condicao == "NOVO" %}
-                            selected
-                        {% endif %}
-                    >
-                        Novo
-                    </option>
+                    {% for tipo in tipos %}
 
-                    <option
-                        value="USADO"
-                        {% if request.GET.condicao == "USADO" %}
-                            selected
-                        {% endif %}
-                    >
-                        Usado
-                    </option>
+                        <option
+                            value="{{ tipo }}"
+                            {% if tipo_selecionado == tipo %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ tipo }}
+                        </option>
 
-                    <option
-                        value="LACRADO"
-                        {% if request.GET.condicao == "LACRADO" %}
-                            selected
-                        {% endif %}
-                    >
-                        Lacrado
-                    </option>
+                    {% endfor %}
 
                 </select>
 
             </div>
 
 
-            <div>
-                <button
-                    type="submit"
-                    class="btn btn-primary"
+            <div class="form-group">
+
+                <label for="id_condicao">
+                    Condição
+                </label>
+
+                <select
+                    id="id_condicao"
+                    name="condicao"
                 >
-                    Filtrar
-                </button>
+
+                    <option value="">
+                        Todas
+                    </option>
+
+                    {% for valor, nome in condicoes %}
+
+                        <option
+                            value="{{ valor }}"
+                            {% if condicao_selecionada == valor %}
+                                selected
+                            {% endif %}
+                        >
+                            {{ nome }}
+                        </option>
+
+                    {% endfor %}
+
+                </select>
+
             </div>
+
+        </div>
+
+
+        <div class="form-actions">
+
+            <button
+                type="submit"
+                class="btn btn-primary"
+            >
+                Pesquisar
+            </button>
+
+            <a
+                href="{% url 'produtos' %}"
+                class="btn"
+            >
+                Limpar filtros
+            </a>
 
         </div>
 
@@ -521,470 +191,165 @@
 </div>
 
 
-<div class="summary">
+<div class="panel">
 
-    <div class="summary-card">
+    {% if produtos %}
 
-        <div class="summary-label">
-            Produtos encontrados
-        </div>
+        <div style="overflow-x: auto;">
 
-        <div class="summary-value">
-            {{ produtos|length }}
-        </div>
+            <table>
 
-    </div>
+                <thead>
 
+                    <tr>
 
-    <div class="summary-card">
+                        <th>Produto</th>
 
-        <div class="summary-label">
-            Quantidade em estoque
-        </div>
+                        <th>Código</th>
 
-        <div class="summary-value">
-            {{ quantidade_total|default:0 }}
-        </div>
+                        <th>Tipo</th>
 
-    </div>
+                        <th>Categoria</th>
 
+                        <th>Unidade</th>
 
-    <div class="summary-card">
+                        <th>Estoque</th>
 
-        <div class="summary-label">
-            Produtos ativos
-        </div>
+                        <th>Estoque mínimo</th>
 
-        <div class="summary-value">
-            {{ produtos_ativos|default:0 }}
-        </div>
+                        <th>Status</th>
 
-    </div>
+                        <th>Ações</th>
 
-</div>
+                    </tr>
 
+                </thead>
 
-<div class="table-card">
 
-    <div class="table-header">
+                <tbody>
 
-        <h3>
-            Lista de produtos
-        </h3>
+                    {% for produto in produtos %}
 
-        <span>
-            {{ produtos|length }} registro(s)
-        </span>
+                        <tr>
 
-    </div>
+                            <td>
+                                <strong>
+                                    {{ produto.nome }}
+                                </strong>
+                            </td>
 
 
-    <div class="table-wrapper">
+                            <td>
+                                {% if produto.codigo %}
+                                    {{ produto.codigo }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
 
-        <table>
 
-            <thead>
+                            <td>
+                                {% if produto.tipo_produto %}
+                                    {{ produto.tipo_produto }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
 
-                <tr>
-                    <th>Produto</th>
-                    <th>Código</th>
-                    <th>Categoria</th>
-                    <th>Tipo</th>
-                    <th>Condição</th>
-                    <th>Estoque</th>
-                    <th>Status</th>
-                    <th>Ação</th>
-                </tr>
 
-            </thead>
+                            <td>
+                                {% if produto.categoria %}
+                                    {{ produto.categoria.nome }}
+                                {% else %}
+                                    —
+                                {% endif %}
+                            </td>
 
 
-            <tbody>
+                            <td>
+                                {{ produto.unidade }}
+                            </td>
 
-                {% for produto in produtos %}
 
-                <tr>
+                            <td>
+                                <strong>
+                                    {{ produto.estoque_atual }}
+                                </strong>
+                            </td>
 
-                    <td>
 
-                        <div class="product-name">
-                            {{ produto.nome }}
-                        </div>
+                            <td>
+                                {{ produto.estoque_minimo }}
+                            </td>
 
-                        {% if produto.descricao %}
 
-                            <div class="product-description">
-                                {{ produto.descricao|truncatechars:100 }}
-                            </div>
+                            <td>
 
-                        {% endif %}
+                                {% if produto.ativo %}
 
-                    </td>
-
-
-                    <td>
-
-                        {% if produto.codigo %}
-                            {{ produto.codigo }}
-                        {% else %}
-                            —
-                        {% endif %}
-
-                    </td>
-
-
-                    <td>
-
-                        {% if produto.categoria %}
-                            {{ produto.categoria.nome }}
-                        {% else %}
-                            —
-                        {% endif %}
-
-                    </td>
-
-
-                    <td>
-
-                        {% if produto.tipo_produto %}
-                            {{ produto.tipo_produto }}
-                        {% else %}
-                            —
-                        {% endif %}
-
-                    </td>
-
-
-                    <!-- CONDIÇÃO DO PRODUTO -->
-
-                    <td>
-
-                        {% if produto.condicao %}
-
-                            {% if produto.condicao|upper == "NOVO" %}
-
-                                <span class="badge badge-new">
-                                    Novo
-                                </span>
-
-                            {% elif produto.condicao|upper == "USADO" %}
-
-                                <span class="badge badge-used">
-                                    Usado
-                                </span>
-
-                            {% elif produto.condicao|upper == "LACRADO" %}
-
-                                <span class="badge badge-sealed">
-                                    Lacrado
-                                </span>
-
-                            {% else %}
-
-                                <span class="badge badge-default">
-                                    {{ produto.condicao }}
-                                </span>
-
-                            {% endif %}
-
-                        {% else %}
-
-                            <span class="badge badge-default">
-                                Não informado
-                            </span>
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <td>
-
-                        <span class="stock">
-                            {{ produto.estoque_atual }}
-                        </span>
-
-                        {{ produto.unidade }}
-
-                    </td>
-
-
-                    <td>
-
-                        {% if produto.ativo %}
-
-                            <span class="status-active">
-                                ● Ativo
-                            </span>
-
-                        {% else %}
-
-                            <span class="status-inactive">
-                                ● Inativo
-                            </span>
-
-                        {% endif %}
-
-                    </td>
-
-
-                    <td>
-
-                        <a
-                            href="{% url 'editar_produto' produto.id %}"
-                            class="btn btn-edit"
-                        >
-                            ✏️ Editar
-                        </a>
-
-                    </td>
-
-                </tr>
-
-
-                {% empty %}
-
-                <tr>
-
-                    <td colspan="8">
-
-                        <div class="empty">
-
-                            <div class="empty-icon">
-                                📦
-                            </div>
-
-                            <strong>
-                                Nenhum produto encontrado
-                            </strong>
-
-                            <p>
-                                Tente alterar os filtros ou cadastre um novo produto.
-                            </p>
-
-                        </div>
-
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-            </tbody>
-
-        </table>
-
-    </div>
-
-
-    <!-- VERSÃO PARA CELULAR -->
-
-    <div class="mobile-products">
-
-        {% for produto in produtos %}
-
-            <div class="mobile-product-card">
-
-                <div class="mobile-product-header">
-
-                    <div>
-
-                        <div class="mobile-product-name">
-                            📦 {{ produto.nome }}
-                        </div>
-
-                        <div class="mobile-product-code">
-
-                            Código:
-
-                            {% if produto.codigo %}
-                                {{ produto.codigo }}
-                            {% else %}
-                                —
-                            {% endif %}
-
-                        </div>
-
-                    </div>
-
-
-                    {% if produto.ativo %}
-
-                        <span class="status-active">
-                            ● Ativo
-                        </span>
-
-                    {% else %}
-
-                        <span class="status-inactive">
-                            ● Inativo
-                        </span>
-
-                    {% endif %}
-
-                </div>
-
-
-                <div class="mobile-product-info">
-
-                    <div class="mobile-info-item">
-
-                        <div class="mobile-info-label">
-                            Categoria
-                        </div>
-
-                        <div class="mobile-info-value">
-
-                            {% if produto.categoria %}
-                                {{ produto.categoria.nome }}
-                            {% else %}
-                                —
-                            {% endif %}
-
-                        </div>
-
-                    </div>
-
-
-                    <div class="mobile-info-item">
-
-                        <div class="mobile-info-label">
-                            Tipo
-                        </div>
-
-                        <div class="mobile-info-value">
-
-                            {% if produto.tipo_produto %}
-                                {{ produto.tipo_produto }}
-                            {% else %}
-                                —
-                            {% endif %}
-
-                        </div>
-
-                    </div>
-
-
-                    <!-- CONDIÇÃO NO CELULAR -->
-
-                    <div class="mobile-info-item">
-
-                        <div class="mobile-info-label">
-                            Condição
-                        </div>
-
-                        <div class="mobile-info-value">
-
-                            {% if produto.condicao %}
-
-                                {% if produto.condicao|upper == "NOVO" %}
-
-                                    <span class="badge badge-new">
-                                        Novo
-                                    </span>
-
-                                {% elif produto.condicao|upper == "USADO" %}
-
-                                    <span class="badge badge-used">
-                                        Usado
-                                    </span>
-
-                                {% elif produto.condicao|upper == "LACRADO" %}
-
-                                    <span class="badge badge-sealed">
-                                        Lacrado
+                                    <span>
+                                        Ativo
                                     </span>
 
                                 {% else %}
 
-                                    <span class="badge badge-default">
-                                        {{ produto.condicao }}
+                                    <span>
+                                        Inativo
                                     </span>
 
                                 {% endif %}
 
-                            {% else %}
-
-                                <span class="badge badge-default">
-                                    Não informado
-                                </span>
-
-                            {% endif %}
-
-                        </div>
-
-                    </div>
+                            </td>
 
 
-                    <div class="mobile-info-item">
+                            <td>
 
-                        <div class="mobile-info-label">
-                            Estoque
-                        </div>
+                                <a
+                                    href="{% url 'editar_produto' produto.id %}"
+                                    class="btn"
+                                >
+                                    Editar
+                                </a>
 
-                        <div class="mobile-info-value">
+                            </td>
 
-                            <span class="stock">
-                                {{ produto.estoque_atual }}
-                            </span>
+                        </tr>
 
-                            {{ produto.unidade }}
+                    {% endfor %}
 
-                        </div>
+                </tbody>
 
-                    </div>
+            </table>
 
-                </div>
+        </div>
 
+    {% else %}
 
-                {% if produto.descricao %}
+        <div class="empty">
 
-                    <div class="mobile-product-code">
-                        {{ produto.descricao|truncatechars:120 }}
-                    </div>
+            <h3>Nenhum produto encontrado.</h3>
 
+            <p>
+                {% if q or categoria_selecionada or tipo_selecionado or condicao_selecionada %}
+                    Nenhum produto corresponde aos filtros informados.
+                {% else %}
+                    Ainda não há produtos cadastrados.
                 {% endif %}
+            </p>
 
 
-                <div class="mobile-product-footer">
+            <a
+                href="{% url 'novo_produto' %}"
+                class="btn btn-primary"
+            >
+                + Iniciar cadastro
+            </a>
 
-                    <a
-                        href="{% url 'editar_produto' produto.id %}"
-                        class="btn btn-edit"
-                    >
-                        ✏️ Editar produto
-                    </a>
+        </div>
 
-                </div>
-
-            </div>
-
-        {% empty %}
-
-            <div class="mobile-product-card">
-
-                <div class="empty">
-
-                    <div class="empty-icon">
-                        📦
-                    </div>
-
-                    <strong>
-                        Nenhum produto encontrado
-                    </strong>
-
-                    <p>
-                        Tente alterar os filtros ou cadastre um novo produto.
-                    </p>
-
-                </div>
-
-            </div>
-
-        {% endfor %}
-
-    </div>
+    {% endif %}
 
 </div>
+
 
 {% endblock %}
