@@ -1,0 +1,52 @@
+{% extends "base/index.html" %}
+{% load static bootstrap %}
+{% block conteudo %} 
+
+    <div class="container mt-5">
+        <h2>{{ instituição.nome }}</h2>
+        <ul class="list-group mt-4">
+            <li class="list-group-item"><b>Nome: </b>{{instituição.nome}}</li>
+            <li class="list-group-item"><b>Razão Social: </b>{{instituição.razao_social}}</li>
+            <li class="list-group-item"><b>CNPJ: </b>{{instituição.cnpj}}</li>
+            <li class="list-group-item"><b>E-mail: </b>{{instituição.email}}</li>
+            <li class="list-group-item"><b>Resumo: </b>{{instituição.resumo_loja|safe}}</li>
+            <li class="list-group-item"><b>Telefone: </b>{{instituição.telefonedecontato|safe}}</li>
+            <li class="list-group-item"><b>Descrição: </b>{{instituição.descricao|safe}}</li>
+        </ul>
+        <h2 class="mt-4">Colaboradores</h2>
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>CPF</th>
+                    <th>Email</th>
+                    <th>Função</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for funcionario in funcionarios %}
+                <tr>
+                    <td>{{ funcionario.id }}</td>
+                    <td>{{ funcionario.nome }}</td>
+                    <td>{{ funcionario.cpf }}</td>
+                    <td>{{ funcionario.email }}</td>
+                    <td>
+                        {% if funcionario.if_funcionario %}
+                            Funcionário
+                        {% else %}
+                            Dona da Instituição
+                        {% endif %}
+                    </td>
+                    <td>
+                        <a href="{% url 'editar_usuario' funcionario.pk %}" class="btn btn-primary">Editar</a>
+                        <a href="{% url 'detalhe_colaborador' funcionario.pk %}" class="btn btn-warning">Detalhes</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock conteudo %}

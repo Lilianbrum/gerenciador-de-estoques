@@ -1,0 +1,36 @@
+{% extends "base/index.html" %}
+{% load static bootstrap %}
+{% block conteudo %} 
+
+    <div class="container mt-5">
+        <a class="btn btn-success" href="{% url 'cadastrar_empresa' %}">Cadastrar Nova Instituição</a>
+        <a class="btn btn-primary" href="{% url 'cadastrar_usuario_admin' %}">Cadastrar Usuário</a>
+        <h2 class="mt-5">Listagem de Instituições</h2>
+        <table class="table table-hover mt-5">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>CNPJ</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for instituição in instituiçãos %}
+                <tr>
+                    <td>{{ instituição.id }}</td>
+                    <td>{{ instituição.nome }}</td>
+                    <td>{{ instituição.cnpj }}</td>
+                    <td>
+                        <a href="{% url 'editar_instituição' instituição.pk %}" class="btn btn-primary">Editar</a>
+                        <a href="{% url 'inativar_instituição' instituição.pk %}" class="btn btn-danger">Inativar</a>
+                        <a href="{% url 'lista_usuarios' instituição.pk %}" class="btn btn-success">Usuários</a>
+                        <a href="{% url 'detalhes_instituição' instituição.pk %}" class="btn btn-info">Detalhes</a>                          
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+{% endblock conteudo %}

@@ -1,39 +1,7 @@
-﻿# Ambiente virtual
-venv/
-.venv/
 env/
-
-# Python
-__pycache__/
-*.py[cod]
-*.class
-
-# Django
-*.log
+migrations/
 db.sqlite3
-db.sqlite3-journal
+__pycache__/
 staticfiles/
+
 media/
-
-# Variáveis de ambiente e segredos
-.env
-.env.*
-!.env.example
-
-# IDE / editores
-.vscode/
-.idea/
-
-# Sistema operacional
-.DS_Store
-Thumbs.db
-
-# Temporários
-*.tmp
-*.bak
-*.swp
-
-# Backups locais
-backup.json
-db_backup.sqlite3
-
